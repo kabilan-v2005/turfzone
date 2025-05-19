@@ -1,19 +1,24 @@
 import back from "../assets/back.svg";
+import print from "../assets/print.svg";
 const Booking = () => {
   return (
     <>
       <div>
         <button className="back">
-          <img
-            src={back}
-            alt="back"
-            className="back-icon"
-          />
+          <img src={back} alt="back" className="back" />
           Booking
         </button>
         <div className="booking-content">
-            <button className="expert-button">Add new booking</button>
-          <button className="expert-button">Export table</button>
+          <div></div>
+          <div className="date">
+            <img src={back} alt="back" className="back-icon" />
+            Today
+            <img src={back} alt="back" className="next-icon" />
+          </div>
+          <button className="expert-button">
+            <img src={print} alt="print" className="print-icon" />
+            Export table
+          </button>
         </div>
       </div>
       <style>{`
@@ -27,13 +32,33 @@ const Booking = () => {
           display: flex;
           align-items: center;
         }
+        .date{
+         width: 200px;
+          height: 61px;
+          background: transparent;
+          border: none;
+          font-weight: 700;
+          font-size: 40px;
+          display: flex;
+          align-items: center;
+          }
+          .back{
+           width: 30px;
+          height: 30px;
+          margin-right: 10px;
+          }
 
         .back-icon {
           width: 30px;
           height: 30px;
-          margin-right: 10px;
+          margin-right: 40px;
         }
-
+.next-icon {
+ width: 30px;
+          height: 30px;
+          margin-left: 40px;
+          transform: rotate(180deg);
+        }
         /* Responsive for medium screens (tablets) */
         @media (max-width: 768px) {
           .back {
@@ -64,10 +89,11 @@ const Booking = () => {
         .booking-content{
           display: flex;
 
-          width:770px;
-          hight: 60px;
+         
           align-items: center;
-          justify-content: right;
+          justify-content: space-between;
+      
+          
           
           }
         .expert-button {
@@ -75,10 +101,25 @@ const Booking = () => {
           height: 40px;
             background: black;
             color: white;
+            border-radius: 5px;
+            font-size: 20px;
+            font-weight: 700;
+            padding:0;
+          margin: 0;
+            align-items: center;
+            justify-content: space-between;
+            display: flex;
         }
+        .print-icon {
+         width: 30px;
+          height: 30px;
+          margin-right: 0px;
+          align-items: center;
+
+          }
       `}</style>
     </>
   );
-}
+};
 
 export default Booking;
