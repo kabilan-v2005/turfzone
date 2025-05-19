@@ -1,12 +1,11 @@
 import { FC } from "react";
 import { NavLink } from "react-router-dom";
-import menuBtn from "../assets/menu-btn.svg"; // Adjusted path
-import DashboardIcon from '../assets/Dashboard.svg';
-import BookingIcon from '../assets/Booking.svg';
-import ManagementIcon from '../assets/management.svg';
-import UserDetailIcon from '../assets/userdetails.svg';
 
-
+import DashboardIcon from "../assets/Dashboard.svg";
+import BookingIcon from "../assets/Booking.svg";
+import ManagementIcon from "../assets/management.svg";
+import UserDetailIcon from "../assets/userdetails.svg";
+import back from "../assets/back.svg"; // Adjusted path
 
 interface SidebarProps {
   isOpen: boolean;
@@ -24,47 +23,70 @@ const Sidebar: FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
             className="menu-btn"
             aria-label="Close menu"
           >
-            <img src={menuBtn} alt="Close" />
+            <img src={back} alt="Close" />
           </button>
         </div>
 
         {/* Sidebar Content Based on Role */}
         <nav>
           <ul>
-  <li>
-    <NavLink to="/admin/dashboard" className={({ isActive }) => (isActive ? "active" : "")}>
-      <span className="nav-link-content">
-        <img src={DashboardIcon} alt="Dashboard" className="nav-icon" />
-        Dashboard
-      </span>
-    </NavLink>
-  </li>
-  <li>
-    <NavLink to="/admin/booking" className={({ isActive }) => (isActive ? "active" : "")}>
-      <span className="nav-link-content">
-        <img src={BookingIcon} alt="Booking" className="nav-icon" />
-        Booking
-      </span>
-    </NavLink>
-  </li>
-  <li>
-    <NavLink to="/admin/management" className={({ isActive }) => (isActive ? "active" : "")}>
-      <span className="nav-link-content">
-        <img src={ManagementIcon} alt="Management" className="nav-icon" />
-        Management
-      </span>
-    </NavLink>
-  </li>
-  <li>
-    <NavLink to="/admin/userdetail" className={({ isActive }) => (isActive ? "active" : "")}>
-      <span className="nav-link-content">
-        <img src={UserDetailIcon} alt="User Details" className="nav-icon" />
-        User Details
-      </span>
-    </NavLink>
-  </li>
-</ul>
-
+            <li>
+              <NavLink
+                to="/admin/dashboard"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                <span className="nav-link-content">
+                  <img
+                    src={DashboardIcon}
+                    alt="Dashboard"
+                    className="nav-icon"
+                  />
+                  Dashboard
+                </span>
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/admin/booking"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                <span className="nav-link-content">
+                  <img src={BookingIcon} alt="Booking" className="nav-icon" />
+                  Booking
+                </span>
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/admin/management"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                <span className="nav-link-content">
+                  <img
+                    src={ManagementIcon}
+                    alt="Management"
+                    className="nav-icon"
+                  />
+                  Management
+                </span>
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/admin/userdetail"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                <span className="nav-link-content">
+                  <img
+                    src={UserDetailIcon}
+                    alt="User Details"
+                    className="nav-icon"
+                  />
+                  User Details
+                </span>
+              </NavLink>
+            </li>
+          </ul>
         </nav>
       </div>
 
@@ -74,7 +96,7 @@ const Sidebar: FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
       {/* Floating button to open Sidebar */}
       {!isOpen && (
         <div className="message-btn" onClick={() => setIsOpen(true)}>
-          <img src={menuBtn} alt="Open Menu" />
+          <img src={back} alt="Open Menu" />
         </div>
       )}
 
@@ -124,15 +146,37 @@ const Sidebar: FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         }
 
         .menu-btn {
-          background: #f3f3f3;
-          border-radius: 50%;
-          padding: 12px;
-          border: none;
-          cursor: pointer;
           display: flex;
-          align-items: center;
-          justify-content: center;
+           position: fixed;
+  top: 50%;
+  left: 0px;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border-radius: 50%;
+  padding: 12px;
+  height: 40px;
+  width: 40px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  z-index: 1000;
         }
+        .message-btn {
+  position: fixed;
+  top: 50%;
+  left: 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border-radius: 50%;
+  padding: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  z-index: 1000;
+
+  transform: rotate(180deg); /* ✅ Rotates the button */
+}
         .nav-link-content {
   display: flex;
   align-items: center;
@@ -210,20 +254,6 @@ nav ul li a.active .nav-icon {
           }
         }
 
-        .message-btn {
-          position: fixed;
-          top: 80px;
-          left: 20px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: #fff;
-          border-radius: 50%;
-          padding: 12px;
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-          cursor: pointer;
-          z-index: 1000;
-        }
 
         .message-btn img {
           width: 16px;

@@ -25,19 +25,7 @@ function Layout() {
            overflow: hidden;
          }
 
-         /* Sidebar container takes 250px width */
-         .sidebar-container {
-           flex: 0 0 250px;
-           /* On small screens, width 0, so sidebar toggle works */
-           width: 0;
-         }
-
-         /* On desktop (1280px+), fix sidebar container width */
-         @media (min-width: 1280px) {
-           .sidebar-container {
-             width: 250px;
-           }
-         }
+        
 
          .page-content {
            flex: 1;
