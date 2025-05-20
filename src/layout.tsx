@@ -23,6 +23,7 @@ function Layout() {
            display: flex;
            height: 100vh;
            overflow: hidden;
+            background-color: white;
          }
 
         
@@ -34,6 +35,9 @@ function Layout() {
            background-color: #fff;
            padding: 30px;
            margin-left: 0;
+           margin-top: 30px;
+           border-top: 5px solid black;
+           border-left: 5px solid black;
            transition: margin-left 0.3s ease;
          }
 
