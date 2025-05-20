@@ -7,7 +7,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  Dot
+
 } from 'recharts';
 
 const bookingData = [
