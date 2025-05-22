@@ -1,45 +1,45 @@
 .main {
-    background-image: url('../assets/lastpagebg.jpg'); /* Replace with your actual image path */
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    width: 100%;
-    margin-top: 620px;
-    background-color: black;
-    height: 100vh; /* or any specific height you need */
-  }
-  
-  .main {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-  }
-  
-  /* Fixed opacity here using rgba instead */
-  .inner-last {
-    height: 630px;
-    width: 1300px;
-    background-color: rgba(0, 0, 0, 0.5); /* fixed: no full opacity fade */
-    border-radius: 30px;
-    padding: 20px;
-    display: grid;
-    grid-template-columns: repeat(5, 1fr); /* 5 equal columns */
-    gap: 30px;
-    justify-content: center;
-    align-content: start;
-  }
-  .inner-inner {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr); /* 5 slots in a single row */
-    gap: 30px;
-    margin: 50px;
-    margin-right: 15px;
-    justify-content: center;
-    align-content: start;
-    width: 100%;
-    height: 100%;
-  }
+  /* background-image: url('../assets/lastpagebg.jpg'); */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+  height: 100vh; /* ✅ Ensure full height */
+  background-color: black;
+  /* margin-top: 620px; */
+
+  /* ✅ Center the whole content */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.inner-last {
+  height: auto; /* ✅ Let it grow naturally */
+  width: auto; /* ✅ Adjust to content */
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 30px;
+  padding: 20px;
+
+  display: flex; /* ✅ Center the grid */
+  justify-content: center;
+  align-items: center;
+}
+
+.inner-inner {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr); /* ✅ 6 columns */
+  grid-template-rows: repeat(4, 1fr);    /* ✅ 4 rows */
+  gap: 50px;
+
+  justify-content: center;
+  align-content: center;
+  margin: 0;           /* ✅ Remove excess margin */
+  width: auto;         /* ✅ Let it auto-fit */
+  height: auto;
+}
+
   
   .slot {
     background-color: #0e1a2b;
@@ -51,7 +51,7 @@
     justify-content: center;
     padding: 10px;
     text-align: center;
-    border-radius: 20px;
+    border-radius: 5px;
     cursor: pointer;
     font-weight: 700;
     font-size: 20px;
@@ -69,13 +69,15 @@
   .maintenance {
     background-color: #0e1a2b;
     color: white;
-    border: 2px solid red;
+    
+    background-color: red;
   }
   
   /* Booked Slot */
   .booked {
-    background-color: red;
+    /* background-color: red; */
     color: white;
+    border: 2px solid red;
     cursor: not-allowed;
   }
   
@@ -95,31 +97,32 @@
   
   .cancel-btn,
   .book-btn {
-    padding: 10px 30px;
-    font-size: 16px;
+    padding: 0px 30px;
+    font-size: 30px;
     width: 150px;
+    font-family: 'Rajdhani', sans-serif;
     height: 50px;
-    font-weight: bold;
-    border-radius: 8px;
-    border: 2px solid #00ff00;
-    background-color: transparent;
-    color: white;
+    font-weight: 700;
+    border-radius: 5px;
+    border: 2px solid #ffffff;
+   
+    
     cursor: pointer;
     transition: 0.3s;
   }
+  .book-btn{
+    background-color: #f0f0f0;
+    color: rgb(0, 0, 0);
+  }
   
   .cancel-btn {
-    border-color: #ff0000;
+    border-color: #ffffff;
+    background-color: transparent;
+    color: white;
   }
   
-  .cancel-btn:hover {
-    background-color: #ff0000;
-  }
   
-  .book-btn:hover {
-    background-color: #00ff00;
-    color: black;
-  }
+ 
   /* Wrap inner and buttons */
 .wrapper {
     display: flex;
@@ -341,3 +344,12 @@
   border-radius: 6px;
   cursor: pointer;
 }
+.inner-last {
+  grid-template-columns: repeat(6, 1fr);
+}
+
+.inner-inner {
+  grid-template-columns: repeat(6, 1fr); 
+  grid-template-rows: repeat(4, 1fr);   
+}
+

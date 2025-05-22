@@ -14,6 +14,7 @@ const Secondpage = ({ onScrollToThirdPage }: { onScrollToThirdPage: () => void }
   const prevImage = () => setCurrentSlide((prev) => (prev - 1 + images.length) % images.length);
   const nextWeek = () => setSelectedDate((prev) => new Date(prev.getTime() + 7 * 24 * 60 * 60 * 1000));
   const prevWeek = () => setSelectedDate((prev) => new Date(prev.getTime() - 7 * 24 * 60 * 60 * 1000));
+
   const getWeekDates = () => {
     const start = new Date(selectedDate);
     const day = start.getDay() || 7;
@@ -48,7 +49,7 @@ const Secondpage = ({ onScrollToThirdPage }: { onScrollToThirdPage: () => void }
             className={`day ${clickedDate?.toDateString() === date.toDateString() ? "selected" : ""}`}
             onClick={() => {
               setClickedDate(date);
-              onScrollToThirdPage(); // Scroll when clicked
+              onScrollToThirdPage();
             }}
           >
             <span>{formatDate(date)}</span>

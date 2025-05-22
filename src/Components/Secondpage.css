@@ -21,7 +21,7 @@
   
   .slider img {
     width: 100%;
-    height: auto;
+    height: 100%;
     border-radius: 10px;
   }
   
@@ -29,21 +29,23 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 30px;
+    font-size: 40px;
     background: none;
     border: none;
     cursor: pointer;
     color: #000;
-    font-weight: bold;
-    padding: 10px;
+    font-weight: 700;
+    
   }
   
   .left {
     left: 0;
+    padding-right: 570px;
   }
   
   .right {
-    right: 0;
+    right: 0px;
+    padding-left: 570px;
   }
   
   .calendar-nav {
