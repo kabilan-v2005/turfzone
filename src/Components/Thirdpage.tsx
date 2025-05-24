@@ -29,24 +29,25 @@ function Thirdpage() {
     { time: "3 AM to 4 AM", status: "available" },
   ];
 
-  const [selectedSlots, setSelectedSlots] = useState([]);
+  const [selectedSlots, setSelectedSlots] = useState<number[]>([]);
+
   const [showPopup, setShowPopup] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
-  const handleSlotClick = (index) => {
-    const clickedSlot = timeSlots[index];
-    if (clickedSlot.status !== "available") {
-      return;
-    }
+const handleSlotClick = (index: number) => {
+  const clickedSlot = timeSlots[index];
+  if (clickedSlot.status !== "available") {
+    return;
+  }
 
-    setSelectedSlots((prevSelected) => {
-      if (prevSelected.includes(index)) {
-        return prevSelected.filter((i) => i !== index);
-      } else {
-        return [...prevSelected, index];
-      }
-    });
-  };
+  setSelectedSlots((prevSelected) => {
+    if (prevSelected.includes(index)) {
+      return prevSelected.filter((i) => i !== index);
+    } else {
+      return [...prevSelected, index];
+    }
+  });
+};
 
   const handleBookClick = () => {
     if (selectedSlots.length > 0) {
@@ -70,13 +71,17 @@ function Thirdpage() {
   };
 
   const sortedSlots = selectedSlots.slice().sort((a, b) => a - b);
-  const fromTime = sortedSlots.length ? timeSlots[sortedSlots[0]].time.split(" to ")[0] : "";
-  const toTime = sortedSlots.length ? timeSlots[sortedSlots[sortedSlots.length - 1]].time.split(" to ")[1] : "";
+  const fromTime = sortedSlots.length
+    ? timeSlots[sortedSlots[0]].time.split(" to ")[0]
+    : "";
+  const toTime = sortedSlots.length
+    ? timeSlots[sortedSlots[sortedSlots.length - 1]].time.split(" to ")[1]
+    : "";
   const amount = sortedSlots.length * 600;
 
   // Dummy user info (you can connect with real inputs later)
   const bookingInfo = {
-    date: new Date().toLocaleDateString('en-GB'),
+    date: new Date().toLocaleDateString("en-GB"),
     name: "AAAAA",
     phone: "1234567890",
     time: `${fromTime} - ${toTime}`,
