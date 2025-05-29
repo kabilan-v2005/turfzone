@@ -69,6 +69,7 @@
   .maintenance {
     background-color: #0e1a2b;
     color: white;
+    cursor: not-allowed;
     
     background-color: red;
   }
