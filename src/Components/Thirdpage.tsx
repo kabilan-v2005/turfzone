@@ -10,125 +10,102 @@ type Slot = {
 
 function Thirdpage() {
   const [slots, setSlots] = useState<Slot[]>([
-    { time: "12 AM to 1 AM", status: "maintenance" },
+    { time: "12 AM to 1 AM", status: "available" },
     { time: "1 AM to 2 AM", status: "available" },
     { time: "2 AM to 3 AM", status: "available" },
     { time: "3 AM to 4 AM", status: "available" },
     { time: "4 AM to 5 AM", status: "available" },
     { time: "5 AM to 6 AM", status: "available" },
-    { time: "6 AM to 7 AM", status: "disabled" },
-    { time: "7 AM to 8 AM", status: "disabled" },
+    { time: "6 AM to 7 AM", status: "available" },
+    { time: "7 AM to 8 AM", status: "available" },
     { time: "8 AM to 9 AM", status: "available" },
     { time: "9 AM to 10 AM", status: "available" },
-    { time: "10 AM to 11 AM", status: "booked" },
+    { time: "10 AM to 11 AM", status: "available" },
     { time: "11 AM to 12 PM", status: "available" },
     { time: "12 PM to 1 PM", status: "available" },
-    { time: "1 PM to 2 PM", status: "booked" },
+    { time: "1 PM to 2 PM", status: "available" },
     { time: "2 PM to 3 PM", status: "available" },
     { time: "3 PM to 4 PM", status: "available" },
     { time: "4 PM to 5 PM", status: "available" },
     { time: "5 PM to 6 PM", status: "available" },
-    { time: "6 PM to 7 PM", status: "booked" },
-    { time: "7 PM to 8 PM", status: "booked" },
+    { time: "6 PM to 7 PM", status: "available" },
+    { time: "7 PM to 8 PM", status: "available" },
     { time: "8 PM to 9 PM", status: "available" },
     { time: "9 PM to 10 PM", status: "available" },
     { time: "10 PM to 11 PM", status: "available" },
     { time: "11 PM to 12 AM", status: "available" },
   ]);
 
-  // Helper: Parse end time string like "7 AM" or "12 PM" to a Date object on today
-  const parseEndTime = (endTimeStr: string): Date => {
-    // Example input: "7 AM", "12 PM", "12 AM"
-    const [hourStr, meridian] = endTimeStr.split(" ");
+  // Get selected date from URL params
+  // Get data from URL params
+  const urlParams = new URLSearchParams(window.location.search);
+  const selectedDateParam = urlParams.get("date");
+  const selectedSlotParam = urlParams.get("slot");
+
+  const [selectedDate, setSelectedDate] = useState<string>(
+    selectedDateParam || new Date().toISOString().slice(0, 10)
+  );
+  console.log("Selected date:", selectedDate);
+  console.log("Selected slot:", selectedSlotParam);
+
+  // Helper: parse time strings to Date objects
+  const parseTime = (timeStr: string, date: Date) => {
+    const [hourStr, meridian] = timeStr.trim().split(" ");
     let hour = parseInt(hourStr, 10);
     if (meridian === "PM" && hour !== 12) hour += 12;
     if (meridian === "AM" && hour === 12) hour = 0;
-
-    const now = new Date();
-    const dt = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-      hour,
-      0,
-      0,
-      0
-    );
-    return dt;
+    const result = new Date(date);
+    result.setHours(hour, 0, 0, 0);
+    return result;
   };
 
-  // Disable slots whose end time is before current time (only if slot is 'available')
   useEffect(() => {
-    const updateSlotsStatus = () => {
+    const updateSlotStatuses = () => {
       const now = new Date();
-
+      const selectedDateObj = new Date(selectedDate);
       setSlots((prevSlots) =>
         prevSlots.map((slot) => {
-          const parts = slot.time.split(" to ");
-          if (parts.length !== 2) return slot;
+          const [from, to] = slot.time.split(" to ");
+          const startTime = parseTime(from, selectedDateObj);
+          const endTime = parseTime(to, selectedDateObj);
 
-          const parseTime = (timeStr: string) => {
-            const [hourStr, meridian] = timeStr.trim().split(" ");
-            let hour = parseInt(hourStr, 10);
-            if (meridian === "PM" && hour !== 12) hour += 12;
-            if (meridian === "AM" && hour === 12) hour = 0;
-            return hour;
-          };
-
-          const startHour = parseTime(parts[0]);
-          const endHour = parseTime(parts[1]);
-
-          const nowDate = new Date(
-            now.getFullYear(),
-            now.getMonth(),
-            now.getDate()
-          );
-          let startDate = new Date(nowDate);
-          startDate.setHours(startHour, 0, 0, 0);
-          let endDate = new Date(nowDate);
-          endDate.setHours(endHour, 0, 0, 0);
-
-          // Handle midnight wrap
-          if (endHour <= startHour) {
-            endDate = new Date(endDate.getTime() + 24 * 60 * 60 * 1000);
+          if (endTime <= startTime) {
+            // overnight slot (e.g., 11 PM to 12 AM)
+            endTime.setDate(endTime.getDate() + 1);
           }
 
-          if (slot.status === "maintenance") return slot; // don't change maintenance slots
-
+          if (slot.status === "maintenance") return slot;
           if (slot.status === "booked") {
-            if (now >= endDate) {
-              // Booked slot time has passed, disable it
-              return { ...slot, status: "disabled" };
-            }
-            return slot; // still booked (current or future)
-          }
-
-          if (now >= endDate) {
-            // Disable slot after its end time has passed
-            if (slot.status !== "disabled") {
+            if (
+              selectedDateObj.toDateString() === now.toDateString() &&
+              now >= endTime
+            ) {
               return { ...slot, status: "disabled" };
             }
             return slot;
           }
 
-          // If slot not ended, make sure it's available (if not maintenance/booked)
+          // Disable slots only for today if end time is passed
+          if (
+            selectedDateObj.toDateString() === now.toDateString() &&
+            now >= endTime
+          ) {
+            return { ...slot, status: "disabled" };
+          }
+
+          // For other dates, slots remain as is
           if (slot.status === "disabled") {
             return { ...slot, status: "available" };
           }
-
           return slot;
         })
       );
     };
 
-    // Run once immediately on mount
-    updateSlotsStatus();
-
-    // Run every 1 minute to update statuses
-    const interval = setInterval(updateSlotsStatus, 60 * 1000);
-
+    updateSlotStatuses();
+    const interval = setInterval(updateSlotStatuses, 60 * 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [selectedDate]);
 
   const [selectedSlots, setSelectedSlots] = useState<number[]>([]);
   const [showPopup, setShowPopup] = useState(false);
@@ -163,13 +140,11 @@ function Thirdpage() {
   };
 
   const handleFinalConfirm = () => {
-    // Update status of booked slots
     const updatedSlots = slots.map((slot, i) =>
       selectedSlots.includes(i)
         ? { ...slot, status: "booked" as SlotStatus }
         : slot
     );
-
     setSlots(updatedSlots);
     setSelectedSlots([]);
     setShowSuccessPopup(false);
@@ -180,15 +155,12 @@ function Thirdpage() {
     ? slots[sortedSlots[0]].time.split(" to ")[0]
     : "";
   const toTime = sortedSlots.length
-    ? slots[sortedSlots[sortedSlots.length - 1]].time
-        .split(" to ")[1]
-        .split("|")[0]
-        .trim()
+    ? slots[sortedSlots[sortedSlots.length - 1]].time.split(" to ")[1]
     : "";
   const amount = sortedSlots.length * 600;
 
   const bookingInfo = {
-    date: new Date().toLocaleDateString("en-GB"),
+    date: selectedDate.split("-").reverse().join("/"),
     name: "AAAAA",
     phone: "1234567890",
     time: `${fromTime} - ${toTime}`,
@@ -233,21 +205,17 @@ function Thirdpage() {
           <div className="popup-overlay">
             <div className="popup">
               <h2>Confirmation</h2>
-
               <div className="popup-row">
                 <span>From :</span>
                 <div className="time-display">{fromTime}</div>
                 <span>To :</span>
                 <div className="time-display">{toTime}</div>
               </div>
-
               <div className="popup-row2">
                 <span>Amount In Total:</span>
                 <div className="amount-box">₹{amount}/-</div>
               </div>
-
               <p className="note">🔴 Note: This Booking Can’t be Canceled</p>
-
               <div className="popup-buttons">
                 <button className="popup-cancel" onClick={handleCancel}>
                   Cancel
@@ -266,7 +234,6 @@ function Thirdpage() {
               <div className="tick">&#10004;</div>
               <h2>Thanks for your booking</h2>
               <h3>Your Slot is Ready!</h3>
-
               <table className="booking-table">
                 <thead>
                   <tr>
