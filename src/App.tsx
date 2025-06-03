@@ -8,27 +8,45 @@ import Thirdpage from "./Components/Thirdpage";
 import Layout from "./layout";
 import Dashboard from "./Components/Dashboard";
 import Booking from "./Components/Booking";
-import Management from "./Components/Management"; 
+import Management from "./Components/Management";
 import UserDetail from "./Components/UserDetail";
-
-import { useRef, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 
 function App() {
   const secondPageRef = useRef<HTMLDivElement>(null);
   const thirdPageRef = useRef<HTMLDivElement>(null);
 
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [shouldScrollToThirdPage, setShouldScrollToThirdPage] = useState(false);
+
+  const hasMounted = useRef(false);
 
   const scrollToSecondPage = () => {
     secondPageRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   const scrollToThirdPage = (date: Date) => {
-    setSelectedDate(date); // ✅ update state when user selects a date
-    setTimeout(() => {
-      thirdPageRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 100); // slight delay to ensure state is updated before scrolling
+    setSelectedDate(date);
+    setShouldScrollToThirdPage(true);
   };
+
+  useEffect(() => {
+    if (!hasMounted.current) {
+      hasMounted.current = true;
+      return;
+    }
+
+    if (shouldScrollToThirdPage) {
+      const timer = setTimeout(() => {
+        thirdPageRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+
+      return () => {
+        clearTimeout(timer);
+        setShouldScrollToThirdPage(false);
+      };
+    }
+  }, [selectedDate, shouldScrollToThirdPage]);
 
   return (
     <Router>
@@ -50,8 +68,6 @@ function App() {
         />
 
         <Route path="/login" element={<Login />} />
-        {/* Remove this line if you don’t need Thirdpage as a separate route */}
-        {/* <Route path="/thirdpage" element={<Thirdpage selectedDate={selectedDate} />} /> */}
 
         {/* ADMIN LAYOUT */}
         <Route path="/admin" element={<Layout />}>
