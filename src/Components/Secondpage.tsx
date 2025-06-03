@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./Secondpage.css";
 
 const images = ["/public/herosectionbgg.jpg", "/public/logo.png"];
@@ -24,10 +24,12 @@ const Secondpage = ({
     setSelectedDate(
       (prev) => new Date(prev.getTime() + 7 * 24 * 60 * 60 * 1000)
     );
-  const prevWeek = () =>
-    setSelectedDate(
-      (prev) => new Date(prev.getTime() - 7 * 24 * 60 * 60 * 1000)
-    );
+ const prevWeek = () => {
+  const newDate = new Date(selectedDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+  if (newDate >= today) {
+    setSelectedDate(newDate);
+  }
+};
 
   const getWeekDates = () => {
     const start = new Date(selectedDate);
@@ -40,7 +42,10 @@ const Secondpage = ({
       return d;
     });
   };
+useEffect(() => {
+  setClickedDate(today);
 
+}, []);
   const formatDate = (date: Date) => `${date.getDate()}`;
 
   const isPastDate = (date: Date) => date < today;
@@ -72,7 +77,8 @@ const Secondpage = ({
       </div>
 
       <div className="calendar-nav">
-        <button onClick={prevWeek}>&#x276E;</button>
+      <button onClick={prevWeek}>&#x276E;</button>
+
         <span>
           {selectedDate.toLocaleString("default", { month: "long" })}{" "}
           {selectedDate.getFullYear()}

@@ -10,34 +10,33 @@ type Slot = {
 
 function Thirdpage() {
   const [slots, setSlots] = useState<Slot[]>([
-    { time: "12 AM to 1 AM", status: "available" },
-    { time: "1 AM to 2 AM", status: "available" },
-    { time: "2 AM to 3 AM", status: "available" },
-    { time: "3 AM to 4 AM", status: "available" },
-    { time: "4 AM to 5 AM", status: "available" },
-    { time: "5 AM to 6 AM", status: "available" },
-    { time: "6 AM to 7 AM", status: "available" },
-    { time: "7 AM to 8 AM", status: "available" },
-    { time: "8 AM to 9 AM", status: "available" },
-    { time: "9 AM to 10 AM", status: "available" },
-    { time: "10 AM to 11 AM", status: "available" },
-    { time: "11 AM to 12 PM", status: "available" },
-    { time: "12 PM to 1 PM", status: "available" },
-    { time: "1 PM to 2 PM", status: "available" },
-    { time: "2 PM to 3 PM", status: "available" },
-    { time: "3 PM to 4 PM", status: "available" },
-    { time: "4 PM to 5 PM", status: "available" },
-    { time: "5 PM to 6 PM", status: "available" },
-    { time: "6 PM to 7 PM", status: "available" },
-    { time: "7 PM to 8 PM", status: "available" },
-    { time: "8 PM to 9 PM", status: "available" },
-    { time: "9 PM to 10 PM", status: "available" },
-    { time: "10 PM to 11 PM", status: "available" },
-    { time: "11 PM to 12 AM", status: "available" },
+    { time: "12 AM", status: "maintenance" },
+    { time: "1 AM", status: "available" },
+    { time: "2 AM", status: "available" },
+    { time: "3 AM", status: "available" },
+    { time: "4 AM", status: "available" },
+    { time: "5 AM", status: "available" },
+    { time: "6 AM", status: "available" },
+    { time: "7 AM", status: "available" },
+    { time: "8 AM", status: "available" },
+    { time: "9 AM", status: "available" },
+    { time: "10 AM", status: "available" },
+    { time: "11 AM", status: "available" },
+    { time: "12 PM", status: "available" },
+    { time: "1 PM", status: "available" },
+    { time: "2 PM", status: "available" },
+    { time: "3 PM", status: "available" },
+    { time: "4 PM", status: "available" },
+    { time: "5 PM", status: "available" },
+    { time: "6 PM", status: "available" },
+    { time: "7 PM", status: "available" },
+    { time: "8 PM", status: "available" },
+    { time: "9 PM", status: "available" },
+    { time: "10 PM", status: "available" },
+    { time: "11 PM", status: "available" },
   ]);
 
   // Get selected date from URL params
-  // Get data from URL params
   const urlParams = new URLSearchParams(window.location.search);
   const selectedDateParam = urlParams.get("date");
   const selectedSlotParam = urlParams.get("slot");
@@ -65,30 +64,24 @@ function Thirdpage() {
       const selectedDateObj = new Date(selectedDate);
       setSlots((prevSlots) =>
         prevSlots.map((slot) => {
-          const [from, to] = slot.time.split(" to ");
-          const startTime = parseTime(from, selectedDateObj);
-          const endTime = parseTime(to, selectedDateObj);
-
-          if (endTime <= startTime) {
-            // overnight slot (e.g., 11 PM to 12 AM)
-            endTime.setDate(endTime.getDate() + 1);
-          }
+          // For this example, slots do not have "to" time, so use start time only
+          const startTime = parseTime(slot.time, selectedDateObj);
 
           if (slot.status === "maintenance") return slot;
           if (slot.status === "booked") {
             if (
               selectedDateObj.toDateString() === now.toDateString() &&
-              now >= endTime
+              now >= startTime
             ) {
               return { ...slot, status: "disabled" };
             }
             return slot;
           }
 
-          // Disable slots only for today if end time is passed
+          // Disable slots only for today if start time is passed
           if (
             selectedDateObj.toDateString() === now.toDateString() &&
-            now >= endTime
+            now >= startTime
           ) {
             return { ...slot, status: "disabled" };
           }
@@ -151,12 +144,13 @@ function Thirdpage() {
   };
 
   const sortedSlots = selectedSlots.slice().sort((a, b) => a - b);
-  const fromTime = sortedSlots.length
-    ? slots[sortedSlots[0]].time.split(" to ")[0]
-    : "";
-  const toTime = sortedSlots.length
-    ? slots[sortedSlots[sortedSlots.length - 1]].time.split(" to ")[1]
-    : "";
+  const fromTime = sortedSlots.length ? slots[sortedSlots[0]].time : "";
+  const lastIndex = sortedSlots[sortedSlots.length - 1];
+const toTime =
+  sortedSlots.length && lastIndex + 1 < slots.length
+    ? slots[lastIndex + 1].time
+    : slots[lastIndex]?.time || "";
+
   const amount = sortedSlots.length * 600;
 
   const bookingInfo = {
@@ -180,14 +174,30 @@ function Thirdpage() {
                 }`}
                 onClick={() => handleSlotClick(index)}
               >
-                {slot.status === "maintenance"
-                  ? "Under Maintenance"
-                  : slot.time}
+              {slot.time}
+
               </div>
             ))}
           </div>
         </div>
 
+  <div className="legend">
+    <div className="legend-item">
+      <div className="slot" style={{ backgroundColor: '#0e1a2b', border: 'none' }} /> Available
+    </div>
+    <div className="legend-item">
+      <div className="slot booked" style={{ border: '2px solid red' }} /> Booked
+    </div>
+    <div className="legend-item">
+      <div className="slot disabled" style={{ backgroundColor: 'grey', border: 'none' }} /> Disabled
+    </div>
+    <div className="legend-item">
+      <div className="slot maintenance" style={{ backgroundColor: 'red', border: 'none' }} /> Under Maintenance
+    </div>
+    <div className="legend-item">
+      <div className="slot selected" style={{ border: '2px solid #00ff00' }} /> Selected
+    </div>
+  </div>
         <div className="buttons buttons-outside">
           <button className="cancel-btn" onClick={() => setSelectedSlots([])}>
             Cancel

@@ -4,7 +4,7 @@
     background-position: center;
     background-repeat: no-repeat;
     width: 100%;
-    margin-top: 620px;
+    margin-top: 0px;
     background-color: black;
     height: 100vh; /* or any specific height you need */
   }
@@ -352,5 +352,39 @@
 .inner-inner {
   grid-template-columns: repeat(6, 1fr); 
   grid-template-rows: repeat(4, 1fr);   
+}
+
+
+.legend {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: white;
+  font-size: 16px;
+  user-select: none;
+}
+
+.legend-item .slot {
+  width: 35px;
+  height: 35px;
+  border-radius: 5px;
+  box-shadow: none;
+  cursor: default;
+  padding: 0;
+  border: none;
+  pointer-events: none;
+}
+.legend-item .slot:not(.booked):not(.disabled):not(.maintenance):not(.selected) {
+  background-color: #0e1a2b; /* same as your slot default */
+  border: none;
 }
 
