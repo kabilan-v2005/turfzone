@@ -1,274 +1,254 @@
 import React, { useState, useEffect, useRef } from "react";
-import "./Thirdpage.css";
 
-type SlotStatus = "available" | "booked" | "disabled" | "maintenance";
+interface ManagementProps {
+  onMaintenanceUpdate?: (maintenanceData: { [date: string]: string[] }) => void;
+}
 
-type Slot = {
-  time: string;
-  status: SlotStatus;
-};
+const Management: React.FC<ManagementProps> = ({ onMaintenanceUpdate }) => {
+  const today = new Date();
 
-type Props = {
-  selectedDate: Date;
-};
+  // Generate date range: 30 days before today, today, 30 days after
+  const dateRange = Array.from({ length: 61 }).map((_, i) => {
+    const date = new Date(today);
+    date.setDate(today.getDate() - 30 + i);
+    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    return {
+      date,
+      label: {
+        date: date.getDate(),
+        day: dayNames[date.getDay()],
+      },
+    };
+  });
 
-const defaultSlots: Slot[] = [
-  { time: "12 AM", status: "available" },
-  { time: "1 AM", status: "available" },
-  { time: "2 AM", status: "available" },
-  { time: "3 AM", status: "available" },
-  { time: "4 AM", status: "available" },
-  { time: "5 AM", status: "available" },
-  { time: "6 AM", status: "available" },
-  { time: "7 AM", status: "available" },
-  { time: "8 AM", status: "available" },
-  { time: "9 AM", status: "available" },
-  { time: "10 AM", status: "available" },
-  { time: "11 AM", status: "available" },
-  { time: "12 PM", status: "available" },
-  { time: "1 PM", status: "available" },
-  { time: "2 PM", status: "available" },
-  { time: "3 PM", status: "available" },
-  { time: "4 PM", status: "available" },
-  { time: "5 PM", status: "available" },
-  { time: "6 PM", status: "available" },
-  { time: "7 PM", status: "available" },
-  { time: "8 PM", status: "available" },
-  { time: "9 PM", status: "available" },
-  { time: "10 PM", status: "available" },
-  { time: "11 PM", status: "available" },
-];
+  const todayIndex = 30;
+  const [selectedDateIndex, setSelectedDateIndex] = useState(todayIndex);
+  const [slotSelections, setSlotSelections] = useState<Record<number, string[]>>({});
+  const [maintenanceDates, setMaintenanceDates] = useState<Record<string, string[]>>({});
+  const [notifyUsers, setNotifyUsers] = useState(false);
+  const [selectAll, setSelectAll] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
-  const [slots, setSlots] = useState<Slot[]>([]);
-  const [selectedSlots, setSelectedSlots] = useState<number[]>([]);
-  const [showPopup, setShowPopup] = useState(false);
-  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-  const [slotDataByDate, setSlotDataByDate] = useState<Record<string, Slot[]>>({});
+  const timeSlots = [
+    "12 AM", "1 AM", "2 AM", "3 AM", "4 AM", "5 AM",
+    "6 AM", "7 AM", "8 AM", "9 AM", "10 AM", "11 AM",
+    "12 PM", "1 PM", "2 PM", "3 PM", "4 PM", "5 PM",
+    "6 PM", "7 PM", "8 PM", "9 PM", "10 PM", "11 PM",
+  ];
 
-  const slotRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const selectedSlots = slotSelections[selectedDateIndex] || [];
+  const currentDateObj = dateRange[selectedDateIndex].date;
+  const formattedCurrentDate = currentDateObj.toISOString().split("T")[0];
+  const maintenanceSlots = maintenanceDates[formattedCurrentDate] || [];
 
-  const parseTime = (timeStr: string, date: Date) => {
-    const [hourStr, meridian] = timeStr.trim().split(" ");
-    let hour = parseInt(hourStr, 10);
-    if (meridian === "PM" && hour !== 12) hour += 12;
-    if (meridian === "AM" && hour === 12) hour = 0;
-    const result = new Date(date);
-    result.setHours(hour, 0, 0, 0);
-    return result;
-  };
+  const containerRef = useRef<HTMLDivElement>(null);
+  const currentDateRef = useRef<HTMLButtonElement>(null);
+
+  // Scroll current date button into view on mount
+  useEffect(() => {
+    if (containerRef.current && currentDateRef.current) {
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const buttonRect = currentDateRef.current.getBoundingClientRect();
+
+      const offset =
+        buttonRect.left -
+        containerRect.left -
+        containerRef.current.clientWidth / 2 +
+        buttonRect.width / 2;
+
+      containerRef.current.scrollBy({ left: offset, behavior: "smooth" });
+    }
+  }, []);
 
   useEffect(() => {
-    const dateKey = selectedDate.toDateString();
+    // Update selectAll checkbox based on selected slots
+    const allSelected = timeSlots.every((slot) => selectedSlots.includes(slot));
+    setSelectAll(allSelected);
+  }, [selectedSlots]);
 
-    if (!slotDataByDate[dateKey]) {
-      const initializedSlots = defaultSlots.map((slot) => ({ ...slot }));
-      setSlotDataByDate((prev) => ({ ...prev, [dateKey]: initializedSlots }));
-      setSlots(initializedSlots);
-    } else {
-      setSlots(slotDataByDate[dateKey]);
+  const toggleSlot = (slot: string) => {
+    const updatedSlots = selectedSlots.includes(slot)
+      ? selectedSlots.filter((s) => s !== slot)
+      : [...selectedSlots, slot];
+
+    setSlotSelections((prev) => ({ ...prev, [selectedDateIndex]: updatedSlots }));
+  };
+
+  const handleSelectAll = () => {
+    setSlotSelections((prev) => ({
+      ...prev,
+      [selectedDateIndex]: selectAll ? [] : [...timeSlots],
+    }));
+    setSelectAll(!selectAll);
+  };
+
+  const handleCancel = () => {
+    setSlotSelections((prev) => ({ ...prev, [selectedDateIndex]: [] }));
+    setNotifyUsers(false);
+  };
+
+  const handleSubmit = () => {
+    if (selectedSlots.length === 0) {
+      alert("Please select some slots to mark as maintenance.");
+      return;
     }
 
-    setSelectedSlots([]);
+    const dateObj = dateRange[selectedDateIndex].date;
+    const formattedDate = dateObj.toISOString().split("T")[0];
 
-    // Scroll to first slot
-    setTimeout(() => {
-      if (slotRefs.current[0]) {
-        slotRefs.current[0].scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    }, 100);
-  }, [selectedDate]);
-
-  useEffect(() => {
-    const updateSlotStatuses = () => {
-      const now = new Date();
-      const isToday = selectedDate.toDateString() === now.toDateString();
-
-      setSlots((prevSlots) =>
-        prevSlots.map((slot) => {
-          const startTime = parseTime(slot.time, selectedDate);
-          if (slot.status === "maintenance" || slot.status === "booked") return slot;
-
-          const endTime = new Date(startTime.getTime() + 30 * 60 * 1000);
-          if (isToday && now >= endTime) return { ...slot, status: "disabled" };
-
-          return { ...slot, status: "available" };
-        })
-      );
+    const updatedMaintenance = {
+      ...maintenanceDates,
+      [formattedDate]: selectedSlots,
     };
 
-    updateSlotStatuses();
-    const interval = setInterval(updateSlotStatuses, 60000);
-    return () => clearInterval(interval);
-  }, [selectedDate]);
-
-  const handleSlotClick = (index: number) => {
-    const clickedSlot = slots[index];
-    if (clickedSlot.status !== "available") return;
-
-    setSelectedSlots((prevSelected) => {
-      const newSelected = prevSelected.includes(index)
-        ? prevSelected.filter((i) => i !== index)
-        : [...prevSelected, index];
-
-      const sorted = newSelected.sort((a, b) => a - b);
-
-      // Ensure continuous selection
-      for (let i = 1; i < sorted.length; i++) {
-        if (sorted[i] !== sorted[i - 1] + 1) {
-          alert("Please select adjacent time slots only");
-          return prevSelected;
-        }
-      }
-
-      return newSelected;
-    });
-  };
-
-  const handleBookClick = () => selectedSlots.length > 0 && setShowPopup(true);
-  const handleCancel = () => setShowPopup(false);
-  const handleConfirm = () => {
-    setShowPopup(false);
-    setShowSuccessPopup(true);
-  };
-
-  const handleFinalConfirm = () => {
-    const updatedSlots = slots.map((slot, i) =>
-      selectedSlots.includes(i) ? { ...slot, status: "booked" as SlotStatus } : slot
-    );
-
-    const dateKey = selectedDate.toDateString();
-    setSlotDataByDate((prev) => ({ ...prev, [dateKey]: updatedSlots }));
-    setSlots(updatedSlots);
-    setSelectedSlots([]);
-    setShowSuccessPopup(false);
-  };
-
-  const sorted = [...selectedSlots].sort((a, b) => a - b);
-  const fromTime = sorted.length ? slots[sorted[0]].time : "";
-  const toTime =
-    sorted.length && sorted[sorted.length - 1] + 1 < slots.length
-      ? slots[sorted[sorted.length - 1] + 1].time
-      : slots[sorted[sorted.length - 1]]?.time || "";
-
-  const bookingInfo = {
-    date: selectedDate.toLocaleDateString("en-GB"),
-    name: "AAAAA",
-    phone: "1234567890",
-    time: `${fromTime} - ${toTime}`,
-    price: sorted.length * 600,
+    setSubmitting(true);
+    setTimeout(() => {
+      setMaintenanceDates(updatedMaintenance);
+      onMaintenanceUpdate?.(updatedMaintenance);
+      setSubmitting(false);
+      alert(`Maintenance slots updated for ${formattedDate}!`);
+    }, 1000);
   };
 
   return (
-    <div className="main">
-      <div className="wrapper">
-        <div className="inner-last">
-          <div className="inner-inner">
-            {slots.map((slot, index) => (
-              <div
-                key={index}
-                ref={(el) => { slotRefs.current[index] = el; }}
-                className={`slot ${slot.status} ${selectedSlots.includes(index) ? "selected" : ""}`}
-                onClick={() => handleSlotClick(index)}
-              >
-                {slot.time}
-              </div>
-            ))}
-          </div>
-        </div>
-  <div className="legend">
-          <div className="legend-item">
-            <div
-              className="slot"
-              style={{ backgroundColor: "#0e1a2b", border: "none" }}
-            />{" "}
-            Available
-          </div>
-          <div className="legend-item">
-            <div className="slot booked" style={{ border: "2px solid red" }} />{" "}
-            Booked
-          </div>
-          <div className="legend-item">
-            <div
-              className="slot disabled"
-              style={{ backgroundColor: "grey", border: "none" }}
-            />{" "}
-            Disabled
-          </div>
-          <div className="legend-item">
-            <div
-              className="slot maintenance"
-              style={{ backgroundColor: "red", border: "none" }}
-            />{" "}
-            Under Maintenance
-          </div>
-          <div className="legend-item">
-            <div
-              className="slot selected"
-              style={{ border: "2px solid #00ff00" }}
-            />{" "}
-            Selected
-          </div>
-        </div>
-        {/* Buttons */}
-        <div className="buttons buttons-outside">
-          <button className="cancel-btn" onClick={() => setSelectedSlots([])}>Cancel</button>
-          <button className="book-btn" disabled={!selectedSlots.length} onClick={handleBookClick}>
-            Book
+    <div
+      className="management-container"
+      style={{ maxWidth: 1600, margin: "0 auto", padding: 16 }}
+    >
+      <h2 style={{ marginBottom: 16 }}>← Management</h2>
+
+      {/* Date selector */}
+      <div
+        ref={containerRef}
+        className="day-selector"
+        style={{ display: "flex", overflowX: "auto", gap: 8, paddingBottom: 10 }}
+      >
+        {dateRange.map((day, index) => (
+          <button
+            key={index}
+            ref={index === todayIndex ? currentDateRef : null}
+            onClick={() => setSelectedDateIndex(index)}
+            style={{
+              minWidth: 60,
+              padding: "8px 10px",
+              borderRadius: 6,
+              border: index === selectedDateIndex ? "2px solid #007bff" : "1px solid #ccc",
+              backgroundColor: index === todayIndex ? "#f0f8ff" : "#fff",
+              cursor: "pointer",
+            }}
+          >
+            <div>{day.label.date}</div>
+            <div>{day.label.day}</div>
           </button>
+        ))}
+      </div>
+
+      {/* Time slots header and select all */}
+      <h3 style={{ margin: "16px 0 8px" }}>Time Slots</h3>
+
+      <div style={{ display: "flex", alignItems: "center", marginBottom: 12 }}>
+        <input
+          type="checkbox"
+          checked={selectAll}
+          onChange={handleSelectAll}
+          id="selectAll"
+          style={{ marginRight: 8 }}
+        />
+        <label htmlFor="selectAll">Select all</label>
+      </div>
+
+      {/* Time slots grid */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(6, 1fr)",
+          gap: 8,
+          marginBottom: 16,
+        }}
+      >
+        {timeSlots.map((slot) => {
+          const isSelected = selectedSlots.includes(slot);
+          const isMaintained = maintenanceSlots.includes(slot);
+
+          // Slot colors: Blue if selected but not maintained, red if maintained
+          let backgroundColor = "#fff";
+          let border = "1px solid #ccc";
+
+          if (isMaintained) {
+            backgroundColor = "#ffe5e5"; // light red background
+            border = "2px solid #f08080"; // red border
+          } else if (isSelected) {
+            backgroundColor = "#cce5ff"; // light blue background
+            border = "2px solid #007bff"; // blue border
+          }
+
+          return (
+            <button
+              key={slot}
+              onClick={() => toggleSlot(slot)}
+              style={{
+                padding: "6px 4px",
+                borderRadius: 4,
+                backgroundColor,
+                border,
+                fontSize: 12,
+                textAlign: "center",
+                cursor: "pointer",
+              }}
+            >
+              {slot}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Buttons and notify checkbox */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          gap: 10,
+          flexWrap: "wrap",
+        }}
+      >
+        <button
+          onClick={handleCancel}
+          style={{
+            backgroundColor: "#dc3545",
+            color: "#fff",
+            padding: "8px 16px",
+            borderRadius: 4,
+            flex: 1,
+          }}
+        >
+          Cancel
+        </button>
+        <div style={{ display: "flex", alignItems: "center", flex: 1 }}>
+          <input
+            type="checkbox"
+            checked={notifyUsers}
+            onChange={() => setNotifyUsers(!notifyUsers)}
+            id="notify"
+            style={{ marginRight: 8 }}
+          />
+          <label htmlFor="notify">Notify all users</label>
         </div>
-
-        {/* Popups */}
-        {showPopup && (
-          <div className="popup-overlay">
-            <div className="popup">
-              <h2>Confirmation</h2>
-              <div className="popup-row">
-                <span>From :</span><div className="time-display">{fromTime}</div>
-                <span>To :</span><div className="time-display">{toTime}</div>
-              </div>
-              <div className="popup-row2">
-                <span>Amount In Total:</span>
-                <div className="amount-box">₹{bookingInfo.price}/-</div>
-              </div>
-              <p className="note">🔴 Note: This Booking Can’t be Canceled</p>
-              <div className="popup-buttons">
-                <button className="popup-cancel" onClick={handleCancel}>Cancel</button>
-                <button className="popup-confirm" onClick={handleConfirm}>Confirm</button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {showSuccessPopup && (
-          <div className="popup-overlay">
-            <div className="success-popup">
-              <div className="tick">&#10004;</div>
-              <h2>Thanks for your booking</h2>
-              <h3>Your Slot is Ready!</h3>
-              <table className="booking-table">
-                <thead>
-                  <tr>
-                    <th>Date</th><th>Name</th><th>Phone No.</th><th>Time</th><th>Price in ₹</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>{bookingInfo.date}</td>
-                    <td>{bookingInfo.name}</td>
-                    <td>{bookingInfo.phone}</td>
-                    <td>{bookingInfo.time}</td>
-                    <td>{bookingInfo.price}</td>
-                  </tr>
-                </tbody>
-              </table>
-              <button className="final-confirm" onClick={handleFinalConfirm}>Confirm</button>
-            </div>
-          </div>
-        )}
+        <button
+          onClick={handleSubmit}
+          disabled={submitting}
+          style={{
+            backgroundColor: submitting ? "#6c757d" : "#007bff",
+            color: "#fff",
+            padding: "8px 16px",
+            borderRadius: 4,
+            flex: 1.5,
+          }}
+        >
+          {submitting ? "Submitting..." : "Mark as Maintenance"}
+        </button>
       </div>
     </div>
   );
 };
 
-export default Thirdpage;
+export default Management;
