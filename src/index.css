@@ -8,5 +8,5 @@ html,
 
   font-family: 'Titillium Web', sans-serif;
 
-  overflow-x: auto;
+  overflow-x: hidden; 
 }

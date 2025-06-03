@@ -7,9 +7,7 @@ type Slot = {
   time: string;
   status: SlotStatus;
 };
-interface ThirdpageProps {
-  maintenanceData: { [date: string]: string[] };
-}
+
 
 
 type Props = {
@@ -166,7 +164,7 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
   return (
     <div className="main">
       <div className="wrapper">
-        <div className="inner-last">
+        
           <div className="inner-inner">
             {slots.map((slot, index) => (
               <div
@@ -179,7 +177,7 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
               </div>
             ))}
           </div>
-        </div>
+        
   <div className="legend">
           <div className="legend-item">
             <div

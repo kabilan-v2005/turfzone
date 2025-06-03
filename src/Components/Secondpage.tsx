@@ -57,24 +57,30 @@ useEffect(() => {
   };
 
   return (
-    <div className="container">
-      <div className="slider">
-        <button
-          className="nav-btn left"
-          onClick={prevImage}
-          aria-label="Previous Image"
-        >
-          &#x276E;
-        </button>
-        <img src={images[currentSlide]} alt="Slider" />
-        <button
-          className="nav-btn right"
-          onClick={nextImage}
-          aria-label="Next Image"
-        >
-          &#x276F;
-        </button>
-      </div>
+   <div className="container">
+  <div className="slider">
+    <button
+      className="nav-btn nav-left"
+      onClick={prevImage}
+      aria-label="Previous Image"
+    >
+      &#x276E;
+    </button>
+
+    <div className="slider-image-wrapper">
+      <img src={images[currentSlide]} alt={`Slide ${currentSlide + 1}`} />
+    </div>
+
+    <button
+      className="nav-btn nav-right"
+      onClick={nextImage}
+      aria-label="Next Image"
+    >
+      &#x276F;
+    </button>
+  </div>
+
+
 
       <div className="calendar-nav">
       <button onClick={prevWeek}>&#x276E;</button>
