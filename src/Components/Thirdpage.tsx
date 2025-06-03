@@ -73,7 +73,7 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
 
     setSelectedSlots([]);
 
-    // Scroll to first slot
+    
     setTimeout(() => {
       if (slotRefs.current[0]) {
         slotRefs.current[0].scrollIntoView({ behavior: "smooth", block: "start" });
