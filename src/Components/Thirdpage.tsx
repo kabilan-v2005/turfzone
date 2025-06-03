@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./Thirdpage.css";
 
 type SlotStatus = "available" | "booked" | "disabled" | "maintenance";
@@ -8,46 +8,46 @@ type Slot = {
   status: SlotStatus;
 };
 
-function Thirdpage() {
-  const [slots, setSlots] = useState<Slot[]>([
-    { time: "12 AM", status: "maintenance" },
-    { time: "1 AM", status: "available" },
-    { time: "2 AM", status: "available" },
-    { time: "3 AM", status: "available" },
-    { time: "4 AM", status: "available" },
-    { time: "5 AM", status: "available" },
-    { time: "6 AM", status: "available" },
-    { time: "7 AM", status: "available" },
-    { time: "8 AM", status: "available" },
-    { time: "9 AM", status: "available" },
-    { time: "10 AM", status: "available" },
-    { time: "11 AM", status: "available" },
-    { time: "12 PM", status: "available" },
-    { time: "1 PM", status: "available" },
-    { time: "2 PM", status: "available" },
-    { time: "3 PM", status: "available" },
-    { time: "4 PM", status: "available" },
-    { time: "5 PM", status: "available" },
-    { time: "6 PM", status: "available" },
-    { time: "7 PM", status: "available" },
-    { time: "8 PM", status: "available" },
-    { time: "9 PM", status: "available" },
-    { time: "10 PM", status: "available" },
-    { time: "11 PM", status: "available" },
-  ]);
+type Props = {
+  selectedDate: Date;
+};
 
-  // Get selected date from URL params
-  const urlParams = new URLSearchParams(window.location.search);
-  const selectedDateParam = urlParams.get("date");
-  const selectedSlotParam = urlParams.get("slot");
+const defaultSlots: Slot[] = [
+  { time: "12 AM", status: "available" },
+  { time: "1 AM", status: "available" },
+  { time: "2 AM", status: "available" },
+  { time: "3 AM", status: "available" },
+  { time: "4 AM", status: "available" },
+  { time: "5 AM", status: "available" },
+  { time: "6 AM", status: "available" },
+  { time: "7 AM", status: "available" },
+  { time: "8 AM", status: "available" },
+  { time: "9 AM", status: "available" },
+  { time: "10 AM", status: "available" },
+  { time: "11 AM", status: "available" },
+  { time: "12 PM", status: "available" },
+  { time: "1 PM", status: "available" },
+  { time: "2 PM", status: "available" },
+  { time: "3 PM", status: "available" },
+  { time: "4 PM", status: "available" },
+  { time: "5 PM", status: "available" },
+  { time: "6 PM", status: "available" },
+  { time: "7 PM", status: "available" },
+  { time: "8 PM", status: "available" },
+  { time: "9 PM", status: "available" },
+  { time: "10 PM", status: "available" },
+  { time: "11 PM", status: "available" },
+];
 
-  const [selectedDate, setSelectedDate] = useState<string>(
-    selectedDateParam || new Date().toISOString().slice(0, 10)
-  );
-  console.log("Selected date:", selectedDate);
-  console.log("Selected slot:", selectedSlotParam);
+const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
+  const [slots, setSlots] = useState<Slot[]>([]);
+  const [selectedSlots, setSelectedSlots] = useState<number[]>([]);
+  const [showPopup, setShowPopup] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [slotDataByDate, setSlotDataByDate] = useState<Record<string, Slot[]>>({});
 
-  // Helper: parse time strings to Date objects
+  const slotRefs = useRef<(HTMLDivElement | null)[]>([]);
+
   const parseTime = (timeStr: string, date: Date) => {
     const [hourStr, meridian] = timeStr.trim().split(" ");
     let hour = parseInt(hourStr, 10);
@@ -58,100 +58,105 @@ function Thirdpage() {
     return result;
   };
 
- useEffect(() => {
- const updateSlotStatuses = () => {
-  const now = new Date();
-  const selectedDateObj = new Date(selectedDate);
-  const isToday = selectedDateObj.toDateString() === now.toDateString();
+  useEffect(() => {
+    const dateKey = selectedDate.toDateString();
 
-  setSlots((prevSlots) =>
-    prevSlots.map((slot) => {
-      const startTime = parseTime(slot.time, selectedDateObj);
+    if (!slotDataByDate[dateKey]) {
+      const initializedSlots = defaultSlots.map((slot) => ({ ...slot }));
+      setSlotDataByDate((prev) => ({ ...prev, [dateKey]: initializedSlots }));
+      setSlots(initializedSlots);
+    } else {
+      setSlots(slotDataByDate[dateKey]);
+    }
 
-      if (slot.status === "maintenance" || slot.status === "booked") {
-        return slot;
+    setSelectedSlots([]);
+
+    // Scroll to first slot
+    setTimeout(() => {
+      if (slotRefs.current[0]) {
+        slotRefs.current[0].scrollIntoView({ behavior: "smooth", block: "start" });
       }
+    }, 100);
+  }, [selectedDate]);
 
-      const endTime = new Date(startTime.getTime() + 30 * 60 * 1000);
+  useEffect(() => {
+    const updateSlotStatuses = () => {
+      const now = new Date();
+      const isToday = selectedDate.toDateString() === now.toDateString();
 
-      if (isToday && now >= endTime) {
-        return { ...slot, status: "disabled" };
-      }
+      setSlots((prevSlots) =>
+        prevSlots.map((slot) => {
+          const startTime = parseTime(slot.time, selectedDate);
+          if (slot.status === "maintenance" || slot.status === "booked") return slot;
 
-      if (!isToday) {
-        // For future dates, enable all available slots
-        return { ...slot, status: "available" };
-      }
+          const endTime = new Date(startTime.getTime() + 30 * 60 * 1000);
+          if (isToday && now >= endTime) return { ...slot, status: "disabled" };
 
-      return slot;
-    })
-  );
-};
+          return { ...slot, status: "available" };
+        })
+      );
+    };
 
-  updateSlotStatuses();
-  const interval = setInterval(updateSlotStatuses, 60 * 1000);
-  return () => clearInterval(interval);
-}, [selectedDate]);
-
-  const [selectedSlots, setSelectedSlots] = useState<number[]>([]);
-  const [showPopup, setShowPopup] = useState(false);
-  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+    updateSlotStatuses();
+    const interval = setInterval(updateSlotStatuses, 60000);
+    return () => clearInterval(interval);
+  }, [selectedDate]);
 
   const handleSlotClick = (index: number) => {
     const clickedSlot = slots[index];
     if (clickedSlot.status !== "available") return;
 
     setSelectedSlots((prevSelected) => {
-      if (prevSelected.includes(index)) {
-        return prevSelected.filter((i) => i !== index);
-      } else {
-        return [...prevSelected, index];
+      const newSelected = prevSelected.includes(index)
+        ? prevSelected.filter((i) => i !== index)
+        : [...prevSelected, index];
+
+      const sorted = newSelected.sort((a, b) => a - b);
+
+      // Ensure continuous selection
+      for (let i = 1; i < sorted.length; i++) {
+        if (sorted[i] !== sorted[i - 1] + 1) {
+          alert("Please select adjacent time slots only");
+          return prevSelected;
+        }
       }
+
+      return newSelected;
     });
   };
 
-  const handleBookClick = () => {
-    if (selectedSlots.length > 0) {
-      setShowPopup(true);
-    }
-  };
-
+  const handleBookClick = () => selectedSlots.length > 0 && setShowPopup(true);
+  const handleCancel = () => setShowPopup(false);
   const handleConfirm = () => {
     setShowPopup(false);
     setShowSuccessPopup(true);
   };
 
-  const handleCancel = () => {
-    setShowPopup(false);
-  };
-
   const handleFinalConfirm = () => {
     const updatedSlots = slots.map((slot, i) =>
-      selectedSlots.includes(i)
-        ? { ...slot, status: "booked" as SlotStatus }
-        : slot
+      selectedSlots.includes(i) ? { ...slot, status: "booked" as SlotStatus } : slot
     );
+
+    const dateKey = selectedDate.toDateString();
+    setSlotDataByDate((prev) => ({ ...prev, [dateKey]: updatedSlots }));
     setSlots(updatedSlots);
     setSelectedSlots([]);
     setShowSuccessPopup(false);
   };
 
-  const sortedSlots = selectedSlots.slice().sort((a, b) => a - b);
-  const fromTime = sortedSlots.length ? slots[sortedSlots[0]].time : "";
-  const lastIndex = sortedSlots[sortedSlots.length - 1];
+  const sorted = [...selectedSlots].sort((a, b) => a - b);
+  const fromTime = sorted.length ? slots[sorted[0]].time : "";
   const toTime =
-    sortedSlots.length && lastIndex + 1 < slots.length
-      ? slots[lastIndex + 1].time
-      : slots[lastIndex]?.time || "";
-
-  const amount = sortedSlots.length * 600;
+    sorted.length && sorted[sorted.length - 1] + 1 < slots.length
+      ? slots[sorted[sorted.length - 1] + 1].time
+      : slots[sorted[sorted.length - 1]]?.time || "";
 
   const bookingInfo = {
-    date: selectedDate.split("-").reverse().join("/"),
+    date: selectedDate.toLocaleDateString("en-GB"),
     name: "AAAAA",
     phone: "1234567890",
     time: `${fromTime} - ${toTime}`,
-    price: amount,
+    price: sorted.length * 600,
   };
 
   return (
@@ -162,9 +167,8 @@ function Thirdpage() {
             {slots.map((slot, index) => (
               <div
                 key={index}
-                className={`slot ${slot.status} ${
-                  selectedSlots.includes(index) ? "selected" : ""
-                }`}
+                ref={(el) => { slotRefs.current[index] = el; }}
+                className={`slot ${slot.status} ${selectedSlots.includes(index) ? "selected" : ""}`}
                 onClick={() => handleSlotClick(index)}
               >
                 {slot.time}
@@ -172,8 +176,7 @@ function Thirdpage() {
             ))}
           </div>
         </div>
-
-        <div className="legend">
+  <div className="legend">
           <div className="legend-item">
             <div
               className="slot"
@@ -207,41 +210,31 @@ function Thirdpage() {
             Selected
           </div>
         </div>
+        {/* Buttons */}
         <div className="buttons buttons-outside">
-          <button className="cancel-btn" onClick={() => setSelectedSlots([])}>
-            Cancel
-          </button>
-          <button
-            className="book-btn"
-            disabled={selectedSlots.length === 0}
-            onClick={handleBookClick}
-          >
+          <button className="cancel-btn" onClick={() => setSelectedSlots([])}>Cancel</button>
+          <button className="book-btn" disabled={!selectedSlots.length} onClick={handleBookClick}>
             Book
           </button>
         </div>
 
+        {/* Popups */}
         {showPopup && (
           <div className="popup-overlay">
             <div className="popup">
               <h2>Confirmation</h2>
               <div className="popup-row">
-                <span>From :</span>
-                <div className="time-display">{fromTime}</div>
-                <span>To :</span>
-                <div className="time-display">{toTime}</div>
+                <span>From :</span><div className="time-display">{fromTime}</div>
+                <span>To :</span><div className="time-display">{toTime}</div>
               </div>
               <div className="popup-row2">
                 <span>Amount In Total:</span>
-                <div className="amount-box">₹{amount}/-</div>
+                <div className="amount-box">₹{bookingInfo.price}/-</div>
               </div>
               <p className="note">🔴 Note: This Booking Can’t be Canceled</p>
               <div className="popup-buttons">
-                <button className="popup-cancel" onClick={handleCancel}>
-                  Cancel
-                </button>
-                <button className="popup-confirm" onClick={handleConfirm}>
-                  Confirm
-                </button>
+                <button className="popup-cancel" onClick={handleCancel}>Cancel</button>
+                <button className="popup-confirm" onClick={handleConfirm}>Confirm</button>
               </div>
             </div>
           </div>
@@ -256,11 +249,7 @@ function Thirdpage() {
               <table className="booking-table">
                 <thead>
                   <tr>
-                    <th>Date</th>
-                    <th>Name</th>
-                    <th>Phone No.</th>
-                    <th>Time</th>
-                    <th>Price in ₹</th>
+                    <th>Date</th><th>Name</th><th>Phone No.</th><th>Time</th><th>Price in ₹</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -273,16 +262,13 @@ function Thirdpage() {
                   </tr>
                 </tbody>
               </table>
-
-              <button className="final-confirm" onClick={handleFinalConfirm}>
-                Confirm
-              </button>
+              <button className="final-confirm" onClick={handleFinalConfirm}>Confirm</button>
             </div>
           </div>
         )}
       </div>
     </div>
   );
-}
+};
 
 export default Thirdpage;
