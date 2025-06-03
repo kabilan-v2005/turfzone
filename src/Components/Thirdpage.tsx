@@ -59,36 +59,34 @@ function Thirdpage() {
   };
 
  useEffect(() => {
-  const updateSlotStatuses = () => {
-    const now = new Date();
-    const selectedDateObj = new Date(selectedDate);
-    const isToday = selectedDateObj.toDateString() === now.toDateString();
+ const updateSlotStatuses = () => {
+  const now = new Date();
+  const selectedDateObj = new Date(selectedDate);
+  const isToday = selectedDateObj.toDateString() === now.toDateString();
 
-    setSlots((prevSlots) =>
-      prevSlots.map((slot) => {
-        const startTime = parseTime(slot.time, selectedDateObj);
+  setSlots((prevSlots) =>
+    prevSlots.map((slot) => {
+      const startTime = parseTime(slot.time, selectedDateObj);
 
-        // Never override maintenance or booked slots
-        if (slot.status === "maintenance" || slot.status === "booked") {
-          return slot;
-        }
-
-        // Calculate end time of slot (30 minutes after start)
-        const endTime = new Date(startTime.getTime() + 30 * 60 * 1000);
-
-        if (isToday && now >= endTime) {
-          return { ...slot, status: "disabled" };
-        }
-
-        // For future dates, ensure slots are available (not disabled)
-        if (!isToday && slot.status === "disabled") {
-          return { ...slot, status: "available" };
-        }
-
+      if (slot.status === "maintenance" || slot.status === "booked") {
         return slot;
-      })
-    );
-  };
+      }
+
+      const endTime = new Date(startTime.getTime() + 30 * 60 * 1000);
+
+      if (isToday && now >= endTime) {
+        return { ...slot, status: "disabled" };
+      }
+
+      if (!isToday) {
+        // For future dates, enable all available slots
+        return { ...slot, status: "available" };
+      }
+
+      return slot;
+    })
+  );
+};
 
   updateSlotStatuses();
   const interval = setInterval(updateSlotStatuses, 60 * 1000);
