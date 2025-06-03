@@ -22,17 +22,41 @@ const Management: React.FC<ManagementProps> = ({ onMaintenanceUpdate }) => {
 
   const todayIndex = 30;
   const [selectedDateIndex, setSelectedDateIndex] = useState(todayIndex);
-  const [slotSelections, setSlotSelections] = useState<Record<number, string[]>>({});
-  const [maintenanceDates, setMaintenanceDates] = useState<Record<string, string[]>>({});
+  const [slotSelections, setSlotSelections] = useState<
+    Record<number, string[]>
+  >({});
+  const [maintenanceDates, setMaintenanceDates] = useState<
+    Record<string, string[]>
+  >({});
   const [notifyUsers, setNotifyUsers] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const timeSlots = [
-    "12 AM", "1 AM", "2 AM", "3 AM", "4 AM", "5 AM",
-    "6 AM", "7 AM", "8 AM", "9 AM", "10 AM", "11 AM",
-    "12 PM", "1 PM", "2 PM", "3 PM", "4 PM", "5 PM",
-    "6 PM", "7 PM", "8 PM", "9 PM", "10 PM", "11 PM",
+    "12 AM",
+    "1 AM",
+    "2 AM",
+    "3 AM",
+    "4 AM",
+    "5 AM",
+    "6 AM",
+    "7 AM",
+    "8 AM",
+    "9 AM",
+    "10 AM",
+    "11 AM",
+    "12 PM",
+    "1 PM",
+    "2 PM",
+    "3 PM",
+    "4 PM",
+    "5 PM",
+    "6 PM",
+    "7 PM",
+    "8 PM",
+    "9 PM",
+    "10 PM",
+    "11 PM",
   ];
 
   const selectedSlots = slotSelections[selectedDateIndex] || [];
@@ -46,7 +70,10 @@ const Management: React.FC<ManagementProps> = ({ onMaintenanceUpdate }) => {
     const updatedSlots = selectedSlots.includes(slot)
       ? selectedSlots.filter((s) => s !== slot)
       : [...selectedSlots, slot];
-    setSlotSelections((prev) => ({ ...prev, [selectedDateIndex]: updatedSlots }));
+    setSlotSelections((prev) => ({
+      ...prev,
+      [selectedDateIndex]: updatedSlots,
+    }));
   };
 
   const handleSelectAll = () => {
@@ -88,54 +115,79 @@ const Management: React.FC<ManagementProps> = ({ onMaintenanceUpdate }) => {
   const getDateStyle = (index: number, date: Date) => {
     const formattedDate = date.toISOString().split("T")[0];
     const isSelected = index === selectedDateIndex;
-    const isToday = index === todayIndex;
     const isMaintenance = maintenanceDates.hasOwnProperty(formattedDate);
 
     let bgColor = "#fff";
     if (isSelected) bgColor = "#e7f1ff";
     if (isMaintenance) bgColor = "#ffe5e5";
     if (isSelected && isMaintenance) bgColor = "#ffdddd";
-    const border = isSelected ? "2px solid #007bff" : "1px solid #ccc";
 
-    return { backgroundColor: bgColor, border };
+    return {
+      backgroundColor: bgColor,
+      border: isSelected ? "2px solid #007bff" : "1px solid #ccc",
+    };
   };
 
   return (
-    <div className="management-container" style={{ maxWidth: 600, margin: "0 auto", padding: 16 }}>
+    <div
+      style={{
+        width: "100%",
+        maxWidth: "1000px",
+        margin: "0 auto",
+        padding: "16px",
+      }}
+    >
       <h2 style={{ marginBottom: 16 }}>← Management</h2>
 
-      <div className="day-selector" style={{ display: "flex", overflowX: "auto", gap: 8, paddingBottom: 10 }}>
+      {/* Date Picker */}
+      <div
+        style={{
+          display: "flex",
+          overflowX: "auto",
+          gap: "8px",
+          paddingBottom: "12px",
+        }}
+      >
         {dateRange.map((day, index) => (
           <button
             key={index}
             onClick={() => setSelectedDateIndex(index)}
             style={{
-              minWidth: 60,
+              minWidth: "60px",
               padding: "8px 10px",
-              borderRadius: 6,
-              ...getDateStyle(index, day.date),
+              borderRadius: "6px",
               cursor: "pointer",
+              ...getDateStyle(index, day.date),
             }}
           >
             <div>{day.label.date}</div>
-            <div>{day.label.day}</div>
+            <div style={{ fontSize: 12 }}>{day.label.day}</div>
           </button>
         ))}
       </div>
 
+      {/* Time Slots */}
       <h3 style={{ margin: "16px 0 8px" }}>Time Slots</h3>
 
-      <div style={{ display: "flex", alignItems: "center", marginBottom: 12 }}>
-        <input type="checkbox" checked={selectAll} onChange={handleSelectAll} id="selectAll" style={{ marginRight: 8 }} />
-        <label htmlFor="selectAll">Select all</label>
+      <div style={{ marginBottom: 12 }}>
+        <label>
+          <input
+            type="checkbox"
+            checked={selectAll}
+            onChange={handleSelectAll}
+            style={{ marginRight: 8 }}
+          />
+          Select all
+        </label>
       </div>
 
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(6, 1fr)",
-          gap: 8,
-          marginBottom: 16,
+          gridTemplateColumns: "repeat(5, 1fr)",
+
+          gap: "10px",
+          marginBottom: "20px",
         }}
       >
         {timeSlots.map((slot) => {
@@ -145,7 +197,7 @@ const Management: React.FC<ManagementProps> = ({ onMaintenanceUpdate }) => {
               key={slot}
               onClick={() => toggleSlot(slot)}
               style={{
-                padding: "6px 4px",
+                padding: "8px 4px",
                 borderRadius: 4,
                 border: isActive ? "2px solid #007bff" : "1px solid #ccc",
                 backgroundColor: isActive ? "#cce5ff" : "#fff",
@@ -160,38 +212,53 @@ const Management: React.FC<ManagementProps> = ({ onMaintenanceUpdate }) => {
         })}
       </div>
 
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+      {/* Action Buttons */}
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 10,
+          justifyContent: "space-between",
+        }}
+      >
         <button
           onClick={handleCancel}
           style={{
             backgroundColor: "#dc3545",
             color: "#fff",
-            padding: "8px 16px",
+            padding: "10px 16px",
             borderRadius: 4,
-            flex: 1,
+            flex: "1 1 100px",
           }}
         >
           Cancel
         </button>
-        <div style={{ display: "flex", alignItems: "center", flex: 1 }}>
+
+        <label
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            flex: "2 1 200px",
+          }}
+        >
           <input
             type="checkbox"
             checked={notifyUsers}
             onChange={() => setNotifyUsers(!notifyUsers)}
-            id="notify"
-            style={{ marginRight: 8 }}
           />
-          <label htmlFor="notify">Notify all users</label>
-        </div>
+          Notify all users
+        </label>
+
         <button
           onClick={handleSubmit}
           disabled={submitting}
           style={{
             backgroundColor: submitting ? "#6c757d" : "#007bff",
             color: "#fff",
-            padding: "8px 16px",
+            padding: "10px 16px",
             borderRadius: 4,
-            flex: 1.5,
+            flex: "2 1 200px",
           }}
         >
           {submitting ? "Submitting..." : "Mark as Maintenance"}
