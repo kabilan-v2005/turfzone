@@ -8,26 +8,21 @@ import Thirdpage from "./Components/Thirdpage";
 import Layout from "./layout";
 import Dashboard from "./Components/Dashboard";
 import Booking from "./Components/Booking";
-import Management from "./Components/Management";
+import Management from "./Components/Management"; 
 import UserDetail from "./Components/UserDetail";
 
-import { useRef, useState } from "react";
+import { useRef } from "react";
 
 function App() {
   const secondPageRef = useRef<HTMLDivElement>(null);
   const thirdPageRef = useRef<HTMLDivElement>(null);
 
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-
   const scrollToSecondPage = () => {
     secondPageRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const scrollToThirdPage = (date: Date) => {
-    setSelectedDate(date);
-    setTimeout(() => {
-      thirdPageRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 100); // short delay to ensure state update
+  const scrollToThirdPage = () => {
+    thirdPageRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -43,14 +38,14 @@ function App() {
                 <Secondpage onScrollToThirdPage={scrollToThirdPage} />
               </div>
               <div ref={thirdPageRef}>
-                <Thirdpage selectedDate={selectedDate} />
+                <Thirdpage />
               </div>
             </>
           }
         />
 
         <Route path="/login" element={<Login />} />
-        <Route path="/thirdpage" element={<Thirdpage selectedDate={selectedDate} />} />
+        <Route path="/thirdpage" element={<Thirdpage />} />
 
         {/* ADMIN LAYOUT */}
         <Route path="/admin" element={<Layout />}>
