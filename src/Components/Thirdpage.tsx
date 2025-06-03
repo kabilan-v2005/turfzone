@@ -58,47 +58,42 @@ function Thirdpage() {
     return result;
   };
 
-  useEffect(() => {
-    const updateSlotStatuses = () => {
-      const now = new Date();
-      const selectedDateObj = new Date(selectedDate);
-      setSlots((prevSlots) =>
-        prevSlots.map((slot) => {
-          // For this example, slots do not have "to" time, so use start time only
-          const startTime = parseTime(slot.time, selectedDateObj);
+ useEffect(() => {
+  const updateSlotStatuses = () => {
+    const now = new Date();
+    const selectedDateObj = new Date(selectedDate);
+    const isToday = selectedDateObj.toDateString() === now.toDateString();
 
-          if (slot.status === "maintenance") return slot;
-          if (slot.status === "booked") {
-            if (
-              selectedDateObj.toDateString() === now.toDateString() &&
-              now >= startTime
-            ) {
-              return { ...slot, status: "disabled" };
-            }
-            return slot;
-          }
+    setSlots((prevSlots) =>
+      prevSlots.map((slot) => {
+        const startTime = parseTime(slot.time, selectedDateObj);
 
-          // Disable slots only for today if start time is passed
-          if (
-            selectedDateObj.toDateString() === now.toDateString() &&
-            now >= startTime
-          ) {
-            return { ...slot, status: "disabled" };
-          }
-
-          // For other dates, slots remain as is
-          if (slot.status === "disabled") {
-            return { ...slot, status: "available" };
-          }
+        // Never override maintenance or booked slots
+        if (slot.status === "maintenance" || slot.status === "booked") {
           return slot;
-        })
-      );
-    };
+        }
 
-    updateSlotStatuses();
-    const interval = setInterval(updateSlotStatuses, 60 * 1000);
-    return () => clearInterval(interval);
-  }, [selectedDate]);
+        // Calculate end time of slot (30 minutes after start)
+        const endTime = new Date(startTime.getTime() + 30 * 60 * 1000);
+
+        if (isToday && now >= endTime) {
+          return { ...slot, status: "disabled" };
+        }
+
+        // For future dates, ensure slots are available (not disabled)
+        if (!isToday && slot.status === "disabled") {
+          return { ...slot, status: "available" };
+        }
+
+        return slot;
+      })
+    );
+  };
+
+  updateSlotStatuses();
+  const interval = setInterval(updateSlotStatuses, 60 * 1000);
+  return () => clearInterval(interval);
+}, [selectedDate]);
 
   const [selectedSlots, setSelectedSlots] = useState<number[]>([]);
   const [showPopup, setShowPopup] = useState(false);
@@ -146,10 +141,10 @@ function Thirdpage() {
   const sortedSlots = selectedSlots.slice().sort((a, b) => a - b);
   const fromTime = sortedSlots.length ? slots[sortedSlots[0]].time : "";
   const lastIndex = sortedSlots[sortedSlots.length - 1];
-const toTime =
-  sortedSlots.length && lastIndex + 1 < slots.length
-    ? slots[lastIndex + 1].time
-    : slots[lastIndex]?.time || "";
+  const toTime =
+    sortedSlots.length && lastIndex + 1 < slots.length
+      ? slots[lastIndex + 1].time
+      : slots[lastIndex]?.time || "";
 
   const amount = sortedSlots.length * 600;
 
@@ -174,30 +169,46 @@ const toTime =
                 }`}
                 onClick={() => handleSlotClick(index)}
               >
-              {slot.time}
-
+                {slot.time}
               </div>
             ))}
           </div>
         </div>
 
-  <div className="legend">
-    <div className="legend-item">
-      <div className="slot" style={{ backgroundColor: '#0e1a2b', border: 'none' }} /> Available
-    </div>
-    <div className="legend-item">
-      <div className="slot booked" style={{ border: '2px solid red' }} /> Booked
-    </div>
-    <div className="legend-item">
-      <div className="slot disabled" style={{ backgroundColor: 'grey', border: 'none' }} /> Disabled
-    </div>
-    <div className="legend-item">
-      <div className="slot maintenance" style={{ backgroundColor: 'red', border: 'none' }} /> Under Maintenance
-    </div>
-    <div className="legend-item">
-      <div className="slot selected" style={{ border: '2px solid #00ff00' }} /> Selected
-    </div>
-  </div>
+        <div className="legend">
+          <div className="legend-item">
+            <div
+              className="slot"
+              style={{ backgroundColor: "#0e1a2b", border: "none" }}
+            />{" "}
+            Available
+          </div>
+          <div className="legend-item">
+            <div className="slot booked" style={{ border: "2px solid red" }} />{" "}
+            Booked
+          </div>
+          <div className="legend-item">
+            <div
+              className="slot disabled"
+              style={{ backgroundColor: "grey", border: "none" }}
+            />{" "}
+            Disabled
+          </div>
+          <div className="legend-item">
+            <div
+              className="slot maintenance"
+              style={{ backgroundColor: "red", border: "none" }}
+            />{" "}
+            Under Maintenance
+          </div>
+          <div className="legend-item">
+            <div
+              className="slot selected"
+              style={{ border: "2px solid #00ff00" }}
+            />{" "}
+            Selected
+          </div>
+        </div>
         <div className="buttons buttons-outside">
           <button className="cancel-btn" onClick={() => setSelectedSlots([])}>
             Cancel
