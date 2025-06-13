@@ -154,12 +154,14 @@ function Dashboard() {
           }
 
           .summary-card {
+         
             font-size: 16px;
             padding: 16px;
           }
 
           .chart-box {
             height: 250px;
+            margin-bottom: 90px;
           }
         }
 

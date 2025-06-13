@@ -22,44 +22,24 @@ const Management: React.FC<ManagementProps> = ({ onMaintenanceUpdate }) => {
 
   const todayIndex = 30;
   const [selectedDateIndex, setSelectedDateIndex] = useState(todayIndex);
-  const [slotSelections, setSlotSelections] = useState<
-    Record<number, string[]>
-  >({});
-  const [maintenanceDates, setMaintenanceDates] = useState<
-    Record<string, string[]>
-  >({});
+  const [slotSelections, setSlotSelections] = useState<Record<number, string[]>>({});
+  const [maintenanceDates, setMaintenanceDates] = useState<Record<string, string[]>>({});
   const [notifyUsers, setNotifyUsers] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const timeSlots = [
-    "12 AM",
-    "1 AM",
-    "2 AM",
-    "3 AM",
-    "4 AM",
-    "5 AM",
-    "6 AM",
-    "7 AM",
-    "8 AM",
-    "9 AM",
-    "10 AM",
-    "11 AM",
-    "12 PM",
-    "1 PM",
-    "2 PM",
-    "3 PM",
-    "4 PM",
-    "5 PM",
-    "6 PM",
-    "7 PM",
-    "8 PM",
-    "9 PM",
-    "10 PM",
-    "11 PM",
+    "12 AM", "1 AM", "2 AM", "3 AM", "4 AM", "5 AM",
+    "6 AM", "7 AM", "8 AM", "9 AM", "10 AM", "11 AM",
+    "12 PM", "1 PM", "2 PM", "3 PM", "4 PM", "5 PM",
+    "6 PM", "7 PM", "8 PM", "9 PM", "10 PM", "11 PM",
   ];
 
   const selectedSlots = slotSelections[selectedDateIndex] || [];
+
+  const currentDateObj = dateRange[selectedDateIndex].date;
+  const formattedDate = currentDateObj.toISOString().split("T")[0];
+  const savedMaintenanceSlots = maintenanceDates[formattedDate] || [];
 
   useEffect(() => {
     const allSelected = timeSlots.every((slot) => selectedSlots.includes(slot));
@@ -67,9 +47,20 @@ const Management: React.FC<ManagementProps> = ({ onMaintenanceUpdate }) => {
   }, [selectedSlots]);
 
   const toggleSlot = (slot: string) => {
-    const updatedSlots = selectedSlots.includes(slot)
+    const isAlreadySelected = selectedSlots.includes(slot);
+    const isSavedMaintenance = savedMaintenanceSlots.includes(slot);
+
+    if (isAlreadySelected && isSavedMaintenance) {
+      const confirmRemove = window.confirm(
+        `This slot (${slot}) is already marked as maintenance. Do you want to remove it?`
+      );
+      if (!confirmRemove) return;
+    }
+
+    const updatedSlots = isAlreadySelected
       ? selectedSlots.filter((s) => s !== slot)
       : [...selectedSlots, slot];
+
     setSlotSelections((prev) => ({
       ...prev,
       [selectedDateIndex]: updatedSlots,
@@ -95,9 +86,6 @@ const Management: React.FC<ManagementProps> = ({ onMaintenanceUpdate }) => {
       return;
     }
 
-    const dateObj = dateRange[selectedDateIndex].date;
-    const formattedDate = dateObj.toISOString().split("T")[0];
-
     const updatedMaintenance = {
       ...maintenanceDates,
       [formattedDate]: selectedSlots,
@@ -112,31 +100,16 @@ const Management: React.FC<ManagementProps> = ({ onMaintenanceUpdate }) => {
     }, 1000);
   };
 
-  const getDateStyle = (index: number, date: Date) => {
-    const formattedDate = date.toISOString().split("T")[0];
+  const getDateStyle = (index: number) => {
     const isSelected = index === selectedDateIndex;
-    const isMaintenance = maintenanceDates.hasOwnProperty(formattedDate);
-
-    let bgColor = "#fff";
-    if (isSelected) bgColor = "#e7f1ff";
-    if (isMaintenance) bgColor = "#ffe5e5";
-    if (isSelected && isMaintenance) bgColor = "#ffdddd";
-
     return {
-      backgroundColor: bgColor,
+      backgroundColor: isSelected ? "#e7f1ff" : "#fff",
       border: isSelected ? "2px solid #007bff" : "1px solid #ccc",
     };
   };
 
   return (
-    <div
-      style={{
-        width: "100%",
-        maxWidth: "1000px",
-        margin: "0 auto",
-        padding: "16px",
-      }}
-    >
+    <div style={{ width: "100%", maxWidth: "1000px", margin: "0 auto", padding: "16px" }}>
       <h2 style={{ marginBottom: 16 }}>← Management</h2>
 
       {/* Date Picker */}
@@ -157,7 +130,7 @@ const Management: React.FC<ManagementProps> = ({ onMaintenanceUpdate }) => {
               padding: "8px 10px",
               borderRadius: "6px",
               cursor: "pointer",
-              ...getDateStyle(index, day.date),
+              ...getDateStyle(index),
             }}
           >
             <div>{day.label.date}</div>
@@ -185,7 +158,6 @@ const Management: React.FC<ManagementProps> = ({ onMaintenanceUpdate }) => {
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(5, 1fr)",
-
           gap: "10px",
           marginBottom: "20px",
         }}
@@ -201,6 +173,7 @@ const Management: React.FC<ManagementProps> = ({ onMaintenanceUpdate }) => {
                 borderRadius: 4,
                 border: isActive ? "2px solid #007bff" : "1px solid #ccc",
                 backgroundColor: isActive ? "#cce5ff" : "#fff",
+                
                 fontSize: 12,
                 textAlign: "center",
                 cursor: "pointer",

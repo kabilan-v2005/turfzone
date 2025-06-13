@@ -1,25 +1,57 @@
 import { useNavigate } from "react-router-dom";
 import back from "../assets/back.svg";
 import print from "../assets/print.svg";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 const Booking = () => {
   const navigate = useNavigate();
+
+  const bookingData = [
+    ["01", "25/05/2024", "AAAAA", "1234567890", "Login"],
+    ["02", "22/11/2023", "BBBBB", "7171282922", "Logout"],
+    ["03", "11/07/2024", "CCCCC", "0987655433", "Login"],
+    ["04", "25/01/2024", "DDDDD", "1983764452", "Login"],
+    ["05", "15/05/2024", "EEEEE", "0937378494", "Login"],
+    ["06", "06/05/2023", "FFFFF", "1234567878", "Login"],
+    ["07", "06/05/2023", "GGGGG", "5555555567", "Logout"],
+    ["01", "25/05/2024", "AAAAA", "1234567890", "Login"],
+    ["02", "22/11/2023", "BBBBB", "7171282922", "Logout"],
+    ["03", "11/07/2024", "CCCCC", "0987655433", "Login"],
+  ];
+
+  const handleExport = () => {
+    const worksheetData = [
+      ["No", "Last booking", "Name", "Phone No.", "Status"],
+      ...bookingData,
+    ];
+    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Bookings");
+
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const data = new Blob([excelBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    saveAs(data, "Bookings.xlsx");
+  };
+
   return (
-    
     <>
       <div>
-      <button className="back" onClick={() => navigate(-1)}> {/* ✅ Go back on click */}
+        <button className="back" onClick={() => navigate(-1)}>
           <img src={back} alt="back" className="back" />
           User
         </button>
+
         <div className="booking-content">
           <div></div>
-
-          <button className="expert-button">
+          <button className="expert-button" onClick={handleExport}>
             <img src={print} alt="print" className="print-icon" />
             Export Table
           </button>
         </div>
+
         <div className="table-container p-4">
           <table className="w-full border border-collapse">
             <thead>
@@ -32,18 +64,7 @@ const Booking = () => {
               </tr>
             </thead>
             <tbody>
-              {[
-                ["01", "25/05/2024", "AAAAA", "1234567890", "Login"],
-                ["02", "22/11/2023", "BBBBB", "7171282922", "Logout"],
-                ["03", "11/07/2024", "CCCCC", "0987655433", "Login"],
-                ["04", "25/01/2024", "DDDDD", "1983764452", "Login"],
-                ["05", "15/05/2024", "EEEEE", "0937378494", "Login"],
-                ["06", "06/05/2023", "FFFFF", "1234567878", "Login"],
-                ["07", "06/05/2023", "GGGGG", "5555555567", "Logout"],
-                ["01", "25/05/2024", "AAAAA", "1234567890", "Login"],
-                ["02", "22/11/2023", "BBBBB", "7171282922", "Logout"],
-                ["03", "11/07/2024", "CCCCC", "0987655433", "Login"],
-              ].map(([no, date, name, phone, status], index) => (
+              {bookingData.map(([no, date, name, phone, status], index) => (
                 <tr key={index} className="border">
                   <td className="p-2 border">{no}</td>
                   <td className="p-2 border">{date}</td>

@@ -2,12 +2,14 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import back from "../assets/back.svg";
 import print from "../assets/print.svg";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 const Booking = () => {
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(new Date());
 
-  const formatDate = (date) =>
+  const formatDate = (date: Date) =>
     date.toLocaleDateString("en-GB", {
       day: "2-digit",
       month: "2-digit",
@@ -24,6 +26,37 @@ const Booking = () => {
     const newDate = new Date(selectedDate);
     newDate.setDate(newDate.getDate() + 1);
     setSelectedDate(newDate);
+  };
+
+  const bookingData = [
+    ["01", "25/05/2024", "AAAAA", "1234567890", "6:00 PM - 8:00 PM", "600", "Booked"],
+    ["02", "22/11/2023", "BBBBB", "7171282922", "6:00 PM - 8:00 PM", "600", "Booked"],
+    ["03", "11/07/2024", "CCCCC", "0987655433", "6:00 PM - 8:00 PM", "600", "Booked"],
+    ["04", "25/01/2024", "DDDDD", "1983764452", "6:00 PM - 8:00 PM", "600", "Booked"],
+    ["05", "15/05/2024", "EEEEE", "0937378944", "6:00 PM - 8:00 PM", "600", "Booked"],
+    ["06", "06/05/2023", "FFFFF", "1234567878", "6:00 AM - 8:00 AM", "600", "Booked"],
+  ];
+
+  const handleExport = () => {
+    const data = [
+      ["No", "Date", "Name", "Phone No.", "Time", "Price in ₹", "Status"],
+      ...bookingData,
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Bookings");
+
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+
+    const file = new Blob([excelBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+
+    saveAs(file, `Booking_${formatDate(selectedDate)}.xlsx`);
   };
 
   return (
@@ -51,7 +84,8 @@ const Booking = () => {
               onClick={handleNextDate}
             />
           </div>
-          <button className="expert-button">
+
+          <button className="expert-button" onClick={handleExport}>
             <img src={print} alt="print" className="print-icon" />
             Export table
           </button>
@@ -72,14 +106,7 @@ const Booking = () => {
               </tr>
             </thead>
             <tbody>
-              {[
-                ["01", "25/05/2024", "AAAAA", "1234567890", "6:00 PM - 8:00 PM", "600", "Booked"],
-                ["02", "22/11/2023", "BBBBB", "7171282922", "6:00 PM - 8:00 PM", "600", "Booked"],
-                ["03", "11/07/2024", "CCCCC", "0987655433", "6:00 PM - 8:00 PM", "600", "Booked"],
-                ["04", "25/01/2024", "DDDDD", "1983764452", "6:00 PM - 8:00 PM", "600", "Booked"],
-                ["05", "15/05/2024", "EEEEE", "0937378944", "6:00 PM - 8:00 PM", "600", "Booked"],
-                ["06", "06/05/2023", "FFFFF", "1234567878", "6:00 AM - 8:00 AM", "600", "Booked"],
-              ].map(([no, date, name, phone, time, price, status]) => (
+              {bookingData.map(([no, date, name, phone, time, price, status]) => (
                 <tr key={no}>
                   <td>{no}</td>
                   <td>{date}</td>
@@ -262,4 +289,5 @@ const Booking = () => {
     </>
   );
 };
+
 export default Booking;
