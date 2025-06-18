@@ -46,19 +46,30 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
   const [selectedSlots, setSelectedSlots] = useState<number[]>([]);
   const [showPopup, setShowPopup] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-  const [slotDataByDate, setSlotDataByDate] = useState<Record<string, Slot[]>>({});
+  const [slotDataByDate, setSlotDataByDate] = useState<Record<string, Slot[]>>(
+    {}
+  );
   const [startSlotIndex, setStartSlotIndex] = useState<number | null>(null);
   const [endSlotIndex, setEndSlotIndex] = useState<number | null>(null);
   const [showEndTimePopup, setShowEndTimePopup] = useState(false);
 
-  const fromTime = startSlotIndex !== null ? slots[startSlotIndex].time.replace(" (Next Day)", "") : "";
-  const toTime = endSlotIndex !== null ? slots[endSlotIndex].time.replace(" (Next Day)", "") : "";
+  const fromTime =
+    startSlotIndex !== null
+      ? slots[startSlotIndex].time.replace(" (Next Day)", "")
+      : "";
+  const toTime =
+    endSlotIndex !== null
+      ? slots[endSlotIndex].time.replace(" (Next Day)", "")
+      : "";
 
   const slotRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const parseTime = (timeStr: string, date: Date) => {
     const isNextDay = timeStr.includes("Next Day");
-    const [hourStr, meridian] = timeStr.replace(" (Next Day)", "").trim().split(" ");
+    const [hourStr, meridian] = timeStr
+      .replace(" (Next Day)", "")
+      .trim()
+      .split(" ");
     let hour = parseInt(hourStr, 10);
     if (meridian === "PM" && hour !== 12) hour += 12;
     if (meridian === "AM" && hour === 12) hour = 0;
@@ -81,7 +92,10 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
     setSelectedSlots([]);
     setTimeout(() => {
       if (slotRefs.current[0]) {
-        slotRefs.current[0].scrollIntoView({ behavior: "smooth", block: "start" });
+        slotRefs.current[0].scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
       }
     }, 100);
   }, [selectedDate]);
@@ -93,7 +107,8 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
       setSlots((prevSlots) =>
         prevSlots.map((slot) => {
           const startTime = parseTime(slot.time, selectedDate);
-          if (slot.status === "maintenance" || slot.status === "booked") return slot;
+          if (slot.status === "maintenance" || slot.status === "booked")
+            return slot;
           const endTime = new Date(startTime.getTime() + 30 * 60 * 1000);
           if (isToday && now >= endTime) return { ...slot, status: "disabled" };
           return { ...slot, status: "available" };
@@ -121,7 +136,9 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
 
   const handleFinalConfirm = () => {
     const updatedSlots = slots.map((slot, i) =>
-      selectedSlots.includes(i) ? { ...slot, status: "booked" as SlotStatus } : slot
+      selectedSlots.includes(i)
+        ? { ...slot, status: "booked" as SlotStatus }
+        : slot
     );
     const dateKey = selectedDate.toDateString();
     setSlotDataByDate((prev) => ({ ...prev, [dateKey]: updatedSlots }));
@@ -143,21 +160,37 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
     <div className="main">
       <div className="wrapper">
         <div className="inner-inner">
-          {slots.filter((slot) => slot.time !== "12 AM (Next Day)").map((slot, index) => (
-            <div
-              key={index}
-              ref={(el) => { slotRefs.current[index] = el; }}
-              className={`slot ${slot.status} ${selectedSlots.includes(index) ? "selected" : ""}`}
-              onClick={() => handleSlotClick(index)}
-            >
-              {slot.status === "maintenance" ? "Under Maintenance" : slot.time}
-            </div>
-          ))}
+          {slots
+            .filter((slot) => slot.time !== "12 AM (Next Day)")
+            .map((slot, index) => (
+              <div
+                key={index}
+                ref={(el) => {
+                  slotRefs.current[index] = el;
+                }}
+                className={`slot ${slot.status} ${
+                  selectedSlots.includes(index) ? "selected" : ""
+                }`}
+                onClick={() => handleSlotClick(index)}
+              >
+                {slot.status === "maintenance"
+                  ? "Under Maintenance"
+                  : slot.time}
+              </div>
+            ))}
         </div>
 
         <div className="buttons buttons-outside">
-          <button className="cancel-btn" onClick={() => setSelectedSlots([])}>Cancel</button>
-          <button className="book-btn" disabled={!selectedSlots.length} onClick={handleBookClick}>Book</button>
+          <button className="cancel-btn" onClick={() => setSelectedSlots([])}>
+            Cancel
+          </button>
+          <button
+            className="book-btn"
+            disabled={!selectedSlots.length}
+            onClick={handleBookClick}
+          >
+            Book
+          </button>
         </div>
 
         {showPopup && (
@@ -176,8 +209,12 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
               </div>
               <p className="note">🔴 Note: This Booking Can’t be Canceled</p>
               <div className="popup-buttons">
-                <button className="popup-cancel" onClick={handleCancel}>Cancel</button>
-                <button className="popup-confirm" onClick={handleConfirm}>Confirm</button>
+                <button className="popup-cancel" onClick={handleCancel}>
+                  Cancel
+                </button>
+                <button className="popup-confirm" onClick={handleConfirm}>
+                  Confirm
+                </button>
               </div>
             </div>
           </div>
@@ -209,58 +246,88 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
                   </tr>
                 </tbody>
               </table>
-              <button className="final-confirm" onClick={handleFinalConfirm}>Confirm</button>
+              <button className="final-confirm" onClick={handleFinalConfirm}>
+                Confirm
+              </button>
             </div>
           </div>
         )}
 
         {showEndTimePopup && startSlotIndex !== null && (
-          <div className="slide-overlay" onClick={() => setShowEndTimePopup(false)}>
+          <div
+            className="slide-overlay"
+            onClick={() => setShowEndTimePopup(false)}
+          >
             <div className="slide-popup" onClick={(e) => e.stopPropagation()}>
               <h2>Select End Time</h2>
               <div className="end-time-options">
-                     {(() => {
-  const start = startSlotIndex + 1;
-  const endOptions = [];
-  let count = 0;
-  let canContinue = true;
+                {(() => {
+                  const start = startSlotIndex + 1;
+                  const endOptions = [];
+                  let availableCount = 0;
+                  let nonAvailableShown = false;
 
-  for (let i = start; i < slots.length && canContinue; i++) {
-    const slot = slots[i];
+                  for (let i = start; i < slots.length; i++) {
+                    const slot = slots[i];
 
-    endOptions.push(
-      <div
-        key={i}
-        className={`end-time-option ${slot.status !== "available" ? "unavailable" : ""}`}
-        onClick={() => {
-          if (slot.status !== "available") return;
-          const selected = [];
-          for (let j = startSlotIndex; j < i; j++) {
-            selected.push(j);
-          }
-          setSelectedSlots(selected);
-          setEndSlotIndex(i);
-          setShowEndTimePopup(false);
-        }}
-      >
-        {slot.status === "maintenance"
-          ? "Under Maintenance"
-          : slot.time.replace(" (Next Day)", "")}
-      </div>
-    );
+                    if (slot.status === "available") {
+                      if (availableCount < 4) {
+                        endOptions.push(
+                          <div
+                            key={i}
+                            className="end-time-option"
+                            onClick={() => {
+                              const selected = [];
+                              for (let j = startSlotIndex; j < i; j++) {
+                                selected.push(j);
+                              }
+                              setSelectedSlots(selected);
+                              setEndSlotIndex(i);
+                              setShowEndTimePopup(false);
+                            }}
+                          >
+                            {slot.time.replace(" (Next Day)", "")}
+                          </div>
+                        );
+                        availableCount++;
+                      } else {
+                        break;
+                      }
+                    } else if (!nonAvailableShown) {
+                      // Show first non-available slot as selectable end time only
+                      endOptions.push(
+                        <div
+                          key={i}
+                          className="end-time-option non-available"
+                          onClick={() => {
+                            const selected = [];
+                            for (let j = startSlotIndex; j < i; j++) {
+                              selected.push(j); // only up to i-1 (excluding non-available)
+                            }
+                            setSelectedSlots(selected);
+                            setEndSlotIndex(i); // end time is shown as non-available
+                            setShowEndTimePopup(false);
+                          }}
+                        >
+                          {slot.status === "maintenance"
+                            ? "Under Maintenance"
+                            : slot.time.replace(" (Next Day)", "")}
+                        </div>
+                      );
+                      nonAvailableShown = true;
+                      break;
+                    }
+                  }
 
-    count++;
-    // Always show first 4, then stop if not available
-    if (count >= 4 && slot.status !== "available") {
-      canContinue = false;
-    }
-  }
-
-  return endOptions;
-})()}
-
+                  return endOptions;
+                })()}
               </div>
-              <button className="popup-cancel" onClick={() => setShowEndTimePopup(false)}>Cancel</button>
+              <button
+                className="popup-cancel"
+                onClick={() => setShowEndTimePopup(false)}
+              >
+                Cancel
+              </button>
             </div>
           </div>
         )}
