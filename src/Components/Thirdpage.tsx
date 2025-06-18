@@ -46,22 +46,13 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
   const [selectedSlots, setSelectedSlots] = useState<number[]>([]);
   const [showPopup, setShowPopup] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-  const [slotDataByDate, setSlotDataByDate] = useState<Record<string, Slot[]>>(
-    {}
-  );
+  const [slotDataByDate, setSlotDataByDate] = useState<Record<string, Slot[]>>({});
   const [startSlotIndex, setStartSlotIndex] = useState<number | null>(null);
   const [endSlotIndex, setEndSlotIndex] = useState<number | null>(null);
   const [showEndTimePopup, setShowEndTimePopup] = useState(false);
 
-  const fromTime =
-    startSlotIndex !== null
-      ? slots[startSlotIndex].time.replace(" (Next Day)", "")
-      : "";
-  const toTime =
-    endSlotIndex !== null
-      ? slots[endSlotIndex].time.replace(" (Next Day)", "")
-      : "";
-  const bookingPrice = selectedSlots.length * 600;
+  const fromTime = startSlotIndex !== null ? slots[startSlotIndex].time.replace(" (Next Day)", "") : "";
+  const toTime = endSlotIndex !== null ? slots[endSlotIndex].time.replace(" (Next Day)", "") : "";
 
   const slotRefs = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -80,7 +71,6 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
 
   useEffect(() => {
     const dateKey = selectedDate.toDateString();
-
     if (!slotDataByDate[dateKey]) {
       const initializedSlots = defaultSlots.map((slot) => ({ ...slot }));
       setSlotDataByDate((prev) => ({ ...prev, [dateKey]: initializedSlots }));
@@ -88,15 +78,10 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
     } else {
       setSlots(slotDataByDate[dateKey]);
     }
-
     setSelectedSlots([]);
-
     setTimeout(() => {
       if (slotRefs.current[0]) {
-        slotRefs.current[0].scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
+        slotRefs.current[0].scrollIntoView({ behavior: "smooth", block: "start" });
       }
     }, 100);
   }, [selectedDate]);
@@ -105,21 +90,16 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
     const updateSlotStatuses = () => {
       const now = new Date();
       const isToday = selectedDate.toDateString() === now.toDateString();
-
       setSlots((prevSlots) =>
         prevSlots.map((slot) => {
           const startTime = parseTime(slot.time, selectedDate);
-          if (slot.status === "maintenance" || slot.status === "booked")
-            return slot;
-
+          if (slot.status === "maintenance" || slot.status === "booked") return slot;
           const endTime = new Date(startTime.getTime() + 30 * 60 * 1000);
           if (isToday && now >= endTime) return { ...slot, status: "disabled" };
-
           return { ...slot, status: "available" };
         })
       );
     };
-
     updateSlotStatuses();
     const interval = setInterval(updateSlotStatuses, 60000);
     return () => clearInterval(interval);
@@ -128,7 +108,6 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
   const handleSlotClick = (index: number) => {
     const clickedSlot = slots[index];
     if (clickedSlot.status !== "available") return;
-
     setStartSlotIndex(index);
     setShowEndTimePopup(true);
   };
@@ -142,11 +121,8 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
 
   const handleFinalConfirm = () => {
     const updatedSlots = slots.map((slot, i) =>
-      selectedSlots.includes(i)
-        ? { ...slot, status: "booked" as SlotStatus }
-        : slot
+      selectedSlots.includes(i) ? { ...slot, status: "booked" as SlotStatus } : slot
     );
-
     const dateKey = selectedDate.toDateString();
     setSlotDataByDate((prev) => ({ ...prev, [dateKey]: updatedSlots }));
     setSlots(updatedSlots);
@@ -155,7 +131,6 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
   };
 
   const sorted = [...selectedSlots].sort((a, b) => a - b);
-
   const bookingInfo = {
     date: selectedDate.toLocaleDateString("en-GB"),
     name: "AAAAA",
@@ -168,37 +143,21 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
     <div className="main">
       <div className="wrapper">
         <div className="inner-inner">
-          {slots
-            .filter((slot) => slot.time !== "12 AM (Next Day)")
-            .map((slot, index) => (
-              <div
-                key={index}
-                ref={(el) => {
-                  slotRefs.current[index] = el;
-                }}
-                className={`slot ${slot.status} ${
-                  selectedSlots.includes(index) ? "selected" : ""
-                }`}
-                onClick={() => handleSlotClick(index)}
-              >
-                {slot.status === "maintenance"
-                  ? "Under Maintenance"
-                  : slot.time}
-              </div>
-            ))}
+          {slots.filter((slot) => slot.time !== "12 AM (Next Day)").map((slot, index) => (
+            <div
+              key={index}
+              ref={(el) => { slotRefs.current[index] = el; }}
+              className={`slot ${slot.status} ${selectedSlots.includes(index) ? "selected" : ""}`}
+              onClick={() => handleSlotClick(index)}
+            >
+              {slot.status === "maintenance" ? "Under Maintenance" : slot.time}
+            </div>
+          ))}
         </div>
 
         <div className="buttons buttons-outside">
-          <button className="cancel-btn" onClick={() => setSelectedSlots([])}>
-            Cancel
-          </button>
-          <button
-            className="book-btn"
-            disabled={!selectedSlots.length}
-            onClick={handleBookClick}
-          >
-            Book
-          </button>
+          <button className="cancel-btn" onClick={() => setSelectedSlots([])}>Cancel</button>
+          <button className="book-btn" disabled={!selectedSlots.length} onClick={handleBookClick}>Book</button>
         </div>
 
         {showPopup && (
@@ -217,12 +176,8 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
               </div>
               <p className="note">🔴 Note: This Booking Can’t be Canceled</p>
               <div className="popup-buttons">
-                <button className="popup-cancel" onClick={handleCancel}>
-                  Cancel
-                </button>
-                <button className="popup-confirm" onClick={handleConfirm}>
-                  Confirm
-                </button>
+                <button className="popup-cancel" onClick={handleCancel}>Cancel</button>
+                <button className="popup-confirm" onClick={handleConfirm}>Confirm</button>
               </div>
             </div>
           </div>
@@ -254,36 +209,33 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
                   </tr>
                 </tbody>
               </table>
-              <button className="final-confirm" onClick={handleFinalConfirm}>
-                Confirm
-              </button>
+              <button className="final-confirm" onClick={handleFinalConfirm}>Confirm</button>
             </div>
           </div>
         )}
 
         {showEndTimePopup && startSlotIndex !== null && (
-  <div className="slide-overlay" onClick={() => setShowEndTimePopup(false)}>
-    <div className="slide-popup" onClick={(e) => e.stopPropagation()}>
-      <h2>Select End Time</h2>
-      <div className="end-time-options">
-      {(() => {
+          <div className="slide-overlay" onClick={() => setShowEndTimePopup(false)}>
+            <div className="slide-popup" onClick={(e) => e.stopPropagation()}>
+              <h2>Select End Time</h2>
+              <div className="end-time-options">
+                     {(() => {
+  const start = startSlotIndex + 1;
   const endOptions = [];
-  let canAdd = true;
+  let count = 0;
+  let canContinue = true;
 
-  for (let i = startSlotIndex! + 1; i <= slots.length; i++) {
-    if (i === slots.length) break;
-
-    if (!canAdd && slots[i].status !== "available") break;
+  for (let i = start; i < slots.length && canContinue; i++) {
+    const slot = slots[i];
 
     endOptions.push(
       <div
         key={i}
-        className={`end-time-option ${
-          slots[i].status !== "available" ? "limited" : ""
-        }`}
+        className={`end-time-option ${slot.status !== "available" ? "unavailable" : ""}`}
         onClick={() => {
+          if (slot.status !== "available") return;
           const selected = [];
-          for (let j = startSlotIndex!; j < i; j++) {
+          for (let j = startSlotIndex; j < i; j++) {
             selected.push(j);
           }
           setSelectedSlots(selected);
@@ -291,23 +243,27 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
           setShowEndTimePopup(false);
         }}
       >
-        {slots[i].time.replace(" (Next Day)", "")}
+        {slot.status === "maintenance"
+          ? "Under Maintenance"
+          : slot.time.replace(" (Next Day)", "")}
       </div>
     );
 
-    if (slots[i].status !== "available") canAdd = false;
+    count++;
+    // Always show first 4, then stop if not available
+    if (count >= 4 && slot.status !== "available") {
+      canContinue = false;
+    }
   }
 
   return endOptions;
 })()}
 
-      </div>
-      <button className="popup-cancel" onClick={() => setShowEndTimePopup(false)}>
-        Cancel
-      </button>
-    </div>
-  </div>
-)}
+              </div>
+              <button className="popup-cancel" onClick={() => setShowEndTimePopup(false)}>Cancel</button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

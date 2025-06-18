@@ -109,20 +109,33 @@ body {
   cursor: pointer;
   padding: 0 20px;
 }
-
 .weekdays {
   display: flex;
   justify-content: center;
+  overflow-x: auto;
+
+  overflow-y: hidden;
+  white-space: nowrap;
   gap: 12px;
   padding-bottom: 10px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  scrollbar-width: thin; /* Firefox */
+  -ms-overflow-style: auto; /* IE 10+ */
 }
 
 .weekdays::-webkit-scrollbar {
-  display: none;
+  height: 8px;
 }
+
+.weekdays::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 4px;
+}
+
+.weekdays::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
 
 .day {
   background: white;
@@ -145,6 +158,7 @@ body {
 .day.disabled {
   opacity: 0.4;
   pointer-events: none;
+  display: none;
 }
 
 
@@ -400,9 +414,9 @@ body {
   }
 
   .day {
-    min-width: 60px;
-    min-height: 60px;
-    padding: 6px;
+    min-width: 40px;
+    min-height: 30px;
+  
   }
 
   .day span:first-child {

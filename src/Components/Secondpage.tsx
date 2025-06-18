@@ -34,17 +34,19 @@ const Secondpage = ({
     }
   };
 
-  const getWeekDates = () => {
-    const start = new Date(selectedDate);
-    const day = start.getDay() || 7;
-    start.setDate(start.getDate() - day + 1);
+const getWeekDates = () => {
+  const weekDates = [];
 
-    return Array.from({ length: 7 }, (_, i) => {
-      const d = new Date(start);
-      d.setDate(d.getDate() + i);
-      return d;
-    });
-  };
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(selectedDate);
+    date.setDate(selectedDate.getDate() + i);
+    weekDates.push(date);
+  }
+
+  return weekDates;
+};
+
+
 
   useEffect(() => {
     setClickedDate(today);
@@ -59,6 +61,8 @@ const Secondpage = ({
     setClickedDate(date);
     onScrollToThirdPage(date);
   };
+
+  const weekDates = getWeekDates();
 
   return (
     <div className="container">
@@ -91,26 +95,29 @@ const Secondpage = ({
         </button>
       </div>
 
-      <div className="weekdays">
-        {getWeekDates().map((date, index) => {
-          const isPast = isPastDate(date);
-          const isSelected =
-            clickedDate?.toDateString() === date.toDateString();
+      <div style={{ overflowX: "auto", width: "100%" }}>
+  <div className="weekdays">
+    {weekDates.map((date, index) => {
+      const isPast = isPastDate(date);
+      const isSelected = clickedDate?.toDateString() === date.toDateString();
 
-          return (
-            <div
-              key={index}
-              className={`day ${isSelected ? "selected" : ""} ${
-                isPast ? "disabled" : ""
-              }`}
-              onClick={() => handleDateClick(date)}
-            >
-              <span>{formatDate(date)}</span>
-              <span>{weekdays[index]}</span>
-            </div>
-          );
-        })}
-      </div>
+      return (
+        <div
+          key={index}
+          className={`day ${isSelected ? "selected" : ""} ${
+            isPast ? "disabled" : ""
+          }`}
+          onClick={() => handleDateClick(date)}
+        >
+          <span>{formatDate(date)}</span>
+          <span>
+            {weekdays[date.getDay() === 0 ? 6 : date.getDay() - 1]}
+          </span>
+        </div>
+      );
+    })}
+  </div>
+</div>
 
       <div className="footer-msg">Book The Slot And Enjoy Your Day!</div>
     </div>

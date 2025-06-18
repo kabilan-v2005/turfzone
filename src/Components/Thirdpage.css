@@ -55,6 +55,7 @@
   transition: 0.2s;
 }
 
+
 .end-time-option:hover {
   background-color: #d0f0ff;
 }
@@ -347,32 +348,6 @@
   border: none;
   border-radius: 5px;
   cursor: pointer;
-}
-
-/* LEGEND */
-.legend {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin: 15px 0;
-  flex-wrap: wrap;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  font-weight: 600;
-  color: blacky;
-}
-
-.legend-item .slot {
-  width: 25px;
-  height: 25px;
-  border-radius: 4px;
-  box-shadow: none;
-  pointer-events: none;
 }
 
 /* MEDIA QUERIES */
