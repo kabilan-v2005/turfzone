@@ -19,38 +19,42 @@ function App() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [shouldScrollToThirdPage, setShouldScrollToThirdPage] = useState(false);
 
-  const hasMounted = useRef(false);
+  const userTriggeredScroll = useRef(false); // ✅ Track if user action triggered scroll
 
+  // ✅ Scroll to top on initial page load
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  // Scroll to Second Page when button is clicked
   const scrollToSecondPage = () => {
     secondPageRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  // Trigger scroll to Third Page from Second Page (user action)
   const scrollToThirdPage = (date: Date) => {
     setSelectedDate(date);
+    userTriggeredScroll.current = true; // ✅ Mark that scroll was user-initiated
     setShouldScrollToThirdPage(true);
   };
 
+  // Scroll to Thirdpage only when user explicitly triggered it
   useEffect(() => {
-    if (!hasMounted.current) {
-      hasMounted.current = true;
-      return;
-    }
-
-    if (shouldScrollToThirdPage) {
+    if (shouldScrollToThirdPage && userTriggeredScroll.current) {
       const timer = setTimeout(() => {
         thirdPageRef.current?.scrollIntoView({ behavior: "smooth" });
+        setShouldScrollToThirdPage(false);
+        userTriggeredScroll.current = false; // ✅ Reset after scroll
       }, 100);
 
-      return () => {
-        clearTimeout(timer);
-        setShouldScrollToThirdPage(false);
-      };
+      return () => clearTimeout(timer);
     }
   }, [selectedDate, shouldScrollToThirdPage]);
 
   return (
     <Router>
       <Routes>
+        <Route path="/login" element={<Login />} />
         <Route
           path="/"
           element={
@@ -66,9 +70,6 @@ function App() {
             </>
           }
         />
-
-        <Route path="/login" element={<Login />} />
-
         {/* ADMIN LAYOUT */}
         <Route path="/admin" element={<Layout />}>
           <Route index path="/admin/dashboard" element={<Dashboard />} />

@@ -1,3 +1,4 @@
+// ... (keep all imports and initial setup same)
 import React, { useState, useEffect, useRef } from "react";
 import "./Thirdpage.css";
 
@@ -7,8 +8,6 @@ type Slot = {
   time: string;
   status: SlotStatus;
 };
-
-
 
 type Props = {
   selectedDate: Date;
@@ -39,6 +38,7 @@ const defaultSlots: Slot[] = [
   { time: "9 PM", status: "available" },
   { time: "10 PM", status: "available" },
   { time: "11 PM", status: "available" },
+  { time: "12 AM (Next Day)", status: "available" },
 ];
 
 const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
@@ -46,16 +46,34 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
   const [selectedSlots, setSelectedSlots] = useState<number[]>([]);
   const [showPopup, setShowPopup] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-  const [slotDataByDate, setSlotDataByDate] = useState<Record<string, Slot[]>>({});
+  const [slotDataByDate, setSlotDataByDate] = useState<Record<string, Slot[]>>(
+    {}
+  );
+  const [startSlotIndex, setStartSlotIndex] = useState<number | null>(null);
+  const [endSlotIndex, setEndSlotIndex] = useState<number | null>(null);
+  const [showEndTimePopup, setShowEndTimePopup] = useState(false);
+
+  const fromTime =
+    startSlotIndex !== null
+      ? slots[startSlotIndex].time.replace(" (Next Day)", "")
+      : "";
+  const toTime =
+    endSlotIndex !== null
+      ? slots[endSlotIndex].time.replace(" (Next Day)", "")
+      : "";
+  const bookingPrice = selectedSlots.length * 600;
 
   const slotRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const parseTime = (timeStr: string, date: Date) => {
-    const [hourStr, meridian] = timeStr.trim().split(" ");
+    const isNextDay = timeStr.includes("Next Day");
+    const [hourStr, meridian] = timeStr.replace(" (Next Day)", "").trim().split(" ");
     let hour = parseInt(hourStr, 10);
     if (meridian === "PM" && hour !== 12) hour += 12;
     if (meridian === "AM" && hour === 12) hour = 0;
+
     const result = new Date(date);
+    if (isNextDay) result.setDate(result.getDate() + 1);
     result.setHours(hour, 0, 0, 0);
     return result;
   };
@@ -73,10 +91,12 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
 
     setSelectedSlots([]);
 
-    
     setTimeout(() => {
       if (slotRefs.current[0]) {
-        slotRefs.current[0].scrollIntoView({ behavior: "smooth", block: "start" });
+        slotRefs.current[0].scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
       }
     }, 100);
   }, [selectedDate]);
@@ -89,7 +109,8 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
       setSlots((prevSlots) =>
         prevSlots.map((slot) => {
           const startTime = parseTime(slot.time, selectedDate);
-          if (slot.status === "maintenance" || slot.status === "booked") return slot;
+          if (slot.status === "maintenance" || slot.status === "booked")
+            return slot;
 
           const endTime = new Date(startTime.getTime() + 30 * 60 * 1000);
           if (isToday && now >= endTime) return { ...slot, status: "disabled" };
@@ -108,23 +129,8 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
     const clickedSlot = slots[index];
     if (clickedSlot.status !== "available") return;
 
-    setSelectedSlots((prevSelected) => {
-      const newSelected = prevSelected.includes(index)
-        ? prevSelected.filter((i) => i !== index)
-        : [...prevSelected, index];
-
-      const sorted = newSelected.sort((a, b) => a - b);
-
-      // Ensure continuous selection
-      for (let i = 1; i < sorted.length; i++) {
-        if (sorted[i] !== sorted[i - 1] + 1) {
-          alert("Please select adjacent time slots only");
-          return prevSelected;
-        }
-      }
-
-      return newSelected;
-    });
+    setStartSlotIndex(index);
+    setShowEndTimePopup(true);
   };
 
   const handleBookClick = () => selectedSlots.length > 0 && setShowPopup(true);
@@ -136,7 +142,9 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
 
   const handleFinalConfirm = () => {
     const updatedSlots = slots.map((slot, i) =>
-      selectedSlots.includes(i) ? { ...slot, status: "booked" as SlotStatus } : slot
+      selectedSlots.includes(i)
+        ? { ...slot, status: "booked" as SlotStatus }
+        : slot
     );
 
     const dateKey = selectedDate.toDateString();
@@ -147,11 +155,6 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
   };
 
   const sorted = [...selectedSlots].sort((a, b) => a - b);
-  const fromTime = sorted.length ? slots[sorted[0]].time : "";
-  const toTime =
-    sorted.length && sorted[sorted.length - 1] + 1 < slots.length
-      ? slots[sorted[sorted.length - 1] + 1].time
-      : slots[sorted[sorted.length - 1]]?.time || "";
 
   const bookingInfo = {
     date: selectedDate.toLocaleDateString("en-GB"),
@@ -164,70 +167,49 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
   return (
     <div className="main">
       <div className="wrapper">
-        
-          <div className="inner-inner">
-            {slots.map((slot, index) => (
+        <div className="inner-inner">
+          {slots
+            .filter((slot) => slot.time !== "12 AM (Next Day)")
+            .map((slot, index) => (
               <div
                 key={index}
-                ref={(el) => { slotRefs.current[index] = el; }}
-                className={`slot ${slot.status} ${selectedSlots.includes(index) ? "selected" : ""}`}
+                ref={(el) => {
+                  slotRefs.current[index] = el;
+                }}
+                className={`slot ${slot.status} ${
+                  selectedSlots.includes(index) ? "selected" : ""
+                }`}
                 onClick={() => handleSlotClick(index)}
               >
-                {slot.time}
+                {slot.status === "maintenance"
+                  ? "Under Maintenance"
+                  : slot.time}
               </div>
             ))}
-          </div>
-        
-  <div className="legend">
-          <div className="legend-item">
-            <div
-              className="slot"
-              style={{ backgroundColor: "#0e1a2b", border: "none" }}
-            />{" "}
-            Available
-          </div>
-          <div className="legend-item">
-            <div className="slot booked" style={{ border: "2px solid red" }} />{" "}
-            Booked
-          </div>
-          <div className="legend-item">
-            <div
-              className="slot disabled"
-              style={{ backgroundColor: "grey", border: "none" }}
-            />{" "}
-            Disabled
-          </div>
-          <div className="legend-item">
-            <div
-              className="slot maintenance"
-              style={{ backgroundColor: "red", border: "none" }}
-            />{" "}
-            Under Maintenance
-          </div>
-          <div className="legend-item">
-            <div
-              className="slot selected"
-              style={{ border: "2px solid #00ff00" }}
-            />{" "}
-            Selected
-          </div>
         </div>
-        {/* Buttons */}
+
         <div className="buttons buttons-outside">
-          <button className="cancel-btn" onClick={() => setSelectedSlots([])}>Cancel</button>
-          <button className="book-btn" disabled={!selectedSlots.length} onClick={handleBookClick}>
+          <button className="cancel-btn" onClick={() => setSelectedSlots([])}>
+            Cancel
+          </button>
+          <button
+            className="book-btn"
+            disabled={!selectedSlots.length}
+            onClick={handleBookClick}
+          >
             Book
           </button>
         </div>
 
-        {/* Popups */}
         {showPopup && (
           <div className="popup-overlay">
             <div className="popup">
               <h2>Confirmation</h2>
               <div className="popup-row">
-                <span>From :</span><div className="time-display">{fromTime}</div>
-                <span>To :</span><div className="time-display">{toTime}</div>
+                <span>From :</span>
+                <div className="time-display">{fromTime}</div>
+                <span>To :</span>
+                <div className="time-display">{toTime}</div>
               </div>
               <div className="popup-row2">
                 <span>Amount In Total:</span>
@@ -235,8 +217,12 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
               </div>
               <p className="note">🔴 Note: This Booking Can’t be Canceled</p>
               <div className="popup-buttons">
-                <button className="popup-cancel" onClick={handleCancel}>Cancel</button>
-                <button className="popup-confirm" onClick={handleConfirm}>Confirm</button>
+                <button className="popup-cancel" onClick={handleCancel}>
+                  Cancel
+                </button>
+                <button className="popup-confirm" onClick={handleConfirm}>
+                  Confirm
+                </button>
               </div>
             </div>
           </div>
@@ -245,13 +231,17 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
         {showSuccessPopup && (
           <div className="popup-overlay">
             <div className="success-popup">
-              <div className="tick">&#10004;</div>
+              <div className="tick">✓</div>
               <h2>Thanks for your booking</h2>
               <h3>Your Slot is Ready!</h3>
               <table className="booking-table">
                 <thead>
                   <tr>
-                    <th>Date</th><th>Name</th><th>Phone No.</th><th>Time</th><th>Price in ₹</th>
+                    <th>Date</th>
+                    <th>Name</th>
+                    <th>Phone No.</th>
+                    <th>Time</th>
+                    <th>Price in ₹</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -264,10 +254,60 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
                   </tr>
                 </tbody>
               </table>
-              <button className="final-confirm" onClick={handleFinalConfirm}>Confirm</button>
+              <button className="final-confirm" onClick={handleFinalConfirm}>
+                Confirm
+              </button>
             </div>
           </div>
         )}
+
+        {showEndTimePopup && startSlotIndex !== null && (
+  <div className="slide-overlay" onClick={() => setShowEndTimePopup(false)}>
+    <div className="slide-popup" onClick={(e) => e.stopPropagation()}>
+      <h2>Select End Time</h2>
+      <div className="end-time-options">
+      {(() => {
+  const endOptions = [];
+  let canAdd = true;
+
+  for (let i = startSlotIndex! + 1; i <= slots.length; i++) {
+    if (i === slots.length) break;
+
+    if (!canAdd && slots[i].status !== "available") break;
+
+    endOptions.push(
+      <div
+        key={i}
+        className={`end-time-option ${
+          slots[i].status !== "available" ? "limited" : ""
+        }`}
+        onClick={() => {
+          const selected = [];
+          for (let j = startSlotIndex!; j < i; j++) {
+            selected.push(j);
+          }
+          setSelectedSlots(selected);
+          setEndSlotIndex(i);
+          setShowEndTimePopup(false);
+        }}
+      >
+        {slots[i].time.replace(" (Next Day)", "")}
+      </div>
+    );
+
+    if (slots[i].status !== "available") canAdd = false;
+  }
+
+  return endOptions;
+})()}
+
+      </div>
+      <button className="popup-cancel" onClick={() => setShowEndTimePopup(false)}>
+        Cancel
+      </button>
+    </div>
+  </div>
+)}
       </div>
     </div>
   );

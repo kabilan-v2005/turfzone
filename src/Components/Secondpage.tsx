@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import "./Secondpage.css";
+import image1 from "../assets/herosectionbgg.jpg";
+import image2 from "../assets/logo.png";
 
-const images = ["/public/herosectionbgg.jpg", "/public/logo.png"];
+const images = [image1, image2];
 const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 const Secondpage = ({
@@ -24,12 +26,13 @@ const Secondpage = ({
     setSelectedDate(
       (prev) => new Date(prev.getTime() + 7 * 24 * 60 * 60 * 1000)
     );
- const prevWeek = () => {
-  const newDate = new Date(selectedDate.getTime() - 7 * 24 * 60 * 60 * 1000);
-  if (newDate >= today) {
-    setSelectedDate(newDate);
-  }
-};
+
+  const prevWeek = () => {
+    const newDate = new Date(selectedDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+    if (newDate >= today) {
+      setSelectedDate(newDate);
+    }
+  };
 
   const getWeekDates = () => {
     const start = new Date(selectedDate);
@@ -42,10 +45,11 @@ const Secondpage = ({
       return d;
     });
   };
-useEffect(() => {
-  setClickedDate(today);
 
-}, []);
+  useEffect(() => {
+    setClickedDate(today);
+  }, []);
+
   const formatDate = (date: Date) => `${date.getDate()}`;
 
   const isPastDate = (date: Date) => date < today;
@@ -53,43 +57,38 @@ useEffect(() => {
   const handleDateClick = (date: Date) => {
     if (isPastDate(date)) return;
     setClickedDate(date);
-    onScrollToThirdPage(date); // Pass date to third page
+    onScrollToThirdPage(date);
   };
 
   return (
-   <div className="container">
-  <div className="slider">
-    <button
-      className="nav-btn nav-left"
-      onClick={prevImage}
-      aria-label="Previous Image"
-    >
-      &#x276E;
-    </button>
+    <div className="container">
+      {/* Slider */}
+      <div className="slider">
+        <button className="nav-btn nav-left" onClick={prevImage}>
+          &#x276E;
+        </button>
 
-    <div className="slider-image-wrapper">
-      <img src={images[currentSlide]} alt={`Slide ${currentSlide + 1}`} />
-    </div>
+        <div className="slider-image-wrapper">
+          <img src={images[currentSlide]} alt={`Slide ${currentSlide + 1}`} />
+        </div>
 
-    <button
-      className="nav-btn nav-right"
-      onClick={nextImage}
-      aria-label="Next Image"
-    >
-      &#x276F;
-    </button>
-  </div>
+        <button className="nav-btn nav-right" onClick={nextImage}>
+          &#x276F;
+        </button>
+      </div>
 
-
-
+      {/* Calendar */}
       <div className="calendar-nav">
-      <button onClick={prevWeek}>&#x276E;</button>
-
+        <button className="left-calendar" onClick={prevWeek}>
+          &#x276E;
+        </button>
         <span>
           {selectedDate.toLocaleString("default", { month: "long" })}{" "}
           {selectedDate.getFullYear()}
         </span>
-        <button onClick={nextWeek}>&#x276F;</button>
+        <button className="right-calendar" onClick={nextWeek}>
+          &#x276F;
+        </button>
       </div>
 
       <div className="weekdays">

@@ -4,8 +4,73 @@
   padding: 0;
 }
 
+/* Overlay background */
+.slide-overlay {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+}
+
+/* Slide-in container */
+.slide-popup {
+  width: 100%;
+  background: #fff;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  padding: 20px;
+  animation: slideUp 0.3s ease-out;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.15);
+}
+
+
+/* Slide animation */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0%);
+  }
+}
+
+.end-time-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.end-time-option {
+  padding: 10px 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: #f9f9f9;
+  transition: 0.2s;
+}
+
+.end-time-option:hover {
+  background-color: #d0f0ff;
+}
+
+.popup-cancel {
+  margin-top: 10px;
+  background: #f44336;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
 .main {
-  background-color: black;
+  background-color: white;
   width: 100%;
   
 
@@ -18,8 +83,9 @@
 
 
 .slot {
-  background-color: #0e1a2b;
-  color: white;
+  background-color: white;
+  color: green;
+  border: 2px solid green;
   height: 80px;
   width: 160px;
 
@@ -55,9 +121,10 @@
 
 
 .disabled {
-  background-color: grey;
-  color: #ccc;
+  background-color: #b9b9b9;
+  color: white;
   cursor: not-allowed;
+  border: none;
 }
 
 .maintenance {
@@ -67,13 +134,15 @@
 }
 
 .booked {
-  color: white;
-  border: 2px solid red;
+  background-color: white;
+  color: grey;
+  border: 2px solid grey;
   cursor: not-allowed;
 }
 
 .selected {
-  border: 2px solid #00ff00;
+  background-color: green;
+  color: white;
 }
 
 .buttons {
@@ -107,7 +176,7 @@
 
 .cancel-btn {
   background-color: transparent;
-  color: white;
+  color: black;
 }
 
 .wrapper {
@@ -295,7 +364,7 @@
   gap: 6px;
   font-size: 14px;
   font-weight: 600;
-  color: white;
+  color: blacky;
 }
 
 .legend-item .slot {
