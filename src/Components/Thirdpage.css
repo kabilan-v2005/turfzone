@@ -15,12 +15,16 @@
   z-index: 1000;
   display: flex;
   align-items: flex-end;
+  justify-content: center;
 }
 
 /* Slide-in container */
 .slide-popup {
-  width: 100%;
+  width: 30%;
   background: #fff;
+  display: flex;
+  
+  justify-content: center;
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
   padding: 20px;
@@ -78,7 +82,7 @@
   display: flex;
   justify-content: center;  
   align-items: center;      /* center vertically */
-
+  margin-bottom: 20px;
   overflow-x: hidden; 
 }
 
@@ -105,13 +109,13 @@
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 20px;
-
-  justify-content: center; /* centers grid items horizontally */
+  
+  justify-content: center; 
   align-content: center;
 
   width: fit-content;
   height: fit-content;
-  margin: 0 auto; /* centers the grid container itself if it has a set width */
+
 }
 
 @media (max-width: 768px) {
@@ -211,7 +215,7 @@
   background: white;
   padding: 20px;
   width: 500px;
-  height: 350px;
+  height: 450px;
   border-radius: 10px;
   border: 2px solid #00A000;
   text-align: center;
@@ -225,9 +229,15 @@
   font-size: 22px;
   margin-bottom: 10px;
 }
+.popup-col{
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
 
 .popup-row,
-.popup-row2 {
+.popup-row2,
+.popup-row3 {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -235,23 +245,26 @@
   margin-bottom: 10px;
 }
 
-.popup-row2 {
-  justify-content: flex-start;
+.popup-row2,
+.popup-row3 {
+  justify-content: flex-between;
 }
 
 .popup-row span,
-.popup-row2 span {
+.popup-row2 span,
+.popup-row3 span {
   font-size: 24px;
   font-weight: 700;
   margin-right: 10px;
 }
 
+
 .popup-row select,
-.amount-box,
+
 .time-display {
-  background: #0a1828;
-  color: white;
-  border: none;
+  background: white;
+  color: black;
+  border: 2px solid black;
   padding: 10px;
   width: 120px;
   height: 40px;
@@ -260,6 +273,32 @@
   font-size: 18px;
   text-align: center;
 }
+.amount-box{
+   background: white;
+  color: black;
+  border: 2px solid black;
+  padding: 10px;
+  width: 180px;
+  height: 40px;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 18px;
+  text-align: center;
+  
+
+}
+.otp-input{ 
+  background: white;
+  color: black;
+  border: 2px solid black;
+  padding: 10px;
+  width: 180px;
+  height: 40px;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 18px;
+  text-align: center;
+  }
 
 .popup-buttons {
   display: flex;
@@ -277,12 +316,16 @@
   font-size: 14px;
   cursor: pointer;
   transition: 0.2s ease;
+  width: 290px;
+  height: 50px;
 }
 
 .popup-cancel {
   background: white;
   color: black;
   border: 2px solid #40BA36;
+  padding: 0px;
+  margin: 0px;
 }
 
 .popup-confirm {
@@ -367,7 +410,6 @@
 }
 
 @media (max-width: 768px) {
-  
   .inner-inner {
     gap: 10px;
   }
@@ -380,19 +422,36 @@
 
   .popup {
     width: 360px;
-    height: 300px;
+    height: auto;
     padding: 15px;
   }
+
+  .popup-row span,
+  .popup-row2 span,
+  .popup-row3 span {
+    font-size: 18px;
+  }
+
+  .otp-input {
+    width: 140px;
+    font-size: 16px;
+    height: 36px;
+  }
+  .popup-cancel,
+.popup-confirm {
+  width: 100%;
+  height: 45px;
+  font-size: 16px;
 }
 
+}
+
+
 @media (max-width: 480px) {
-  
   .inner-inner {
     gap: 8px;
     padding: 5px;
   }
-
-
 
   .slot {
     width: 57px;
@@ -402,22 +461,68 @@
 
   .popup {
     width: 280px;
-    height: 270px;
+    height: auto;
     padding: 10px;
+    align-items: flex-start;
   }
 
   .popup-row span,
-  .popup-row2 span {
-    font-size: 18px;
+  .popup-row2 span,
+  .popup-row3 span {
+    font-size: 16px;
+  }
+
+  .popup-col{
+  display: flex;
+  justify-content: space-between;
+  
+}
+
+  .time-display,
+  .amount-box,
+  .otp-input {
+    width: 120px;
+    height: 35px;
+    font-size: 14px;
   }
 
   .popup-buttons {
     flex-direction: column;
     gap: 10px;
+    
   }
+  .popup-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  gap: 20px;
+}
+
+.popup-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.time-display {
+  font-weight: bold;
+  margin-top: 4px;
+  background-color: #f0f0f0;
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+
 
   .final-confirm {
     width: 100px;
     font-size: 16px;
   }
+  .popup-cancel,
+.popup-confirm {
+  width: 100%;
+  height: 40px;
+  font-size: 14px;
+}
+
 }
