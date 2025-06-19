@@ -45,3 +45,40 @@
   width: 24px;
   margin-right: 24px;
 }
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-right: 24px;
+}
+
+.dashboard-btn {
+  font-family: 'Titillium Web', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  background-color: #2e2e2e;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.dashboard-btn:hover {
+  background-color: #444;
+}
+
+.user-email {
+  font-family: 'Titillium Web', sans-serif;
+  font-size: 16px;
+  background-color: #f1f1f1;
+  padding: 6px 12px;
+  border-radius: 20px;
+  color: #333;
+  margin-right: 15px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

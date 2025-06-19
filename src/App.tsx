@@ -1,5 +1,5 @@
 import "./App.css";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Hedder from "./Components/Hedder";
 import Hero from "./Components/Hero";
 import Login from "./Login/Login";
@@ -11,6 +11,8 @@ import Booking from "./Components/Booking";
 import Management from "./Components/Management";
 import UserDetail from "./Components/UserDetail";
 import { useRef, useEffect, useState } from "react";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { useAuth } from "./context/AuthContext";
 
 function App() {
   const secondPageRef = useRef<HTMLDivElement>(null);
@@ -18,6 +20,7 @@ function App() {
 
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [shouldScrollToThirdPage, setShouldScrollToThirdPage] = useState(false);
+  const { currentUser, loading } = useAuth();
 
   const userTriggeredScroll = useRef(false); // ✅ Track if user action triggered scroll
 
@@ -51,10 +54,24 @@ function App() {
     }
   }, [selectedDate, shouldScrollToThirdPage]);
 
+  if (loading) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        fontSize: '1.5rem'
+      }}>
+        Loading...
+      </div>
+    );
+  }
+
   return (
     <Router>
       <Routes>
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={currentUser ? <Navigate to="/dashboard" /> : <Login />} />
         <Route
           path="/"
           element={
@@ -70,8 +87,26 @@ function App() {
             </>
           }
         />
-        {/* ADMIN LAYOUT */}
-        <Route path="/admin" element={<Layout />}>
+        
+        {/* User Dashboard Route */}
+        <Route 
+          path="/dashboard" 
+          element={
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
+          }
+        />
+        
+        {/* ADMIN LAYOUT with Protected Routes */}
+        <Route 
+          path="/admin" 
+          element={
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
+          }
+        >
           <Route index path="/admin/dashboard" element={<Dashboard />} />
           <Route path="/admin/booking" element={<Booking />} />
           <Route path="/admin/management" element={<Management />} />
