@@ -267,3 +267,25 @@ html, body {
   margin-bottom: 1rem;
   gap: 0.5rem;
 }
+.avatar {
+  width: 80px;
+  height: 80px;
+  background-color: #f0f3f1;
+  color: #000;
+  font-size: 36px;
+  font-weight: bold;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+  user-select: none;
+  text-transform: uppercase;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+.username-block{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
