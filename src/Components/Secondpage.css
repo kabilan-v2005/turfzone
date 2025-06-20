@@ -92,12 +92,12 @@ body {
 
   font-size: 40px;
   margin-top: 10px;
-  margin-bottom: 50px;
+  /* margin-bottom: 50px; */
   font-weight: bold;
 
 }
 
-.left-calendar {
+/* .left-calendar {
   position: relative;
   right: 230px;
   font-size: 30px;
@@ -109,7 +109,7 @@ body {
   left: 230px;
   font-size: 30px;
   align-self: end;
-}
+} */
 
 .calendar-nav button {
   background: none;
@@ -162,7 +162,7 @@ body {
   font-weight: 500;
 
   flex-shrink: 0;
-  margin-bottom: 50px;
+
 }
 
 .day.disabled {
@@ -205,6 +205,15 @@ body {
   color: #000;
 }
 
+.weekdays-inside-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  flex-wrap: nowrap;
+  overflow-x: hidden;
+}
+
 /* Media Queries for Responsiveness */
 @media (max-width: 1200px) {
   .slider {
@@ -221,7 +230,7 @@ body {
 
   }
 
-  .left-calendar {
+  /* .left-calendar {
     position: relative;
     right: 190px;
     font-size: 30px;
@@ -233,7 +242,7 @@ body {
     left: 190px;
     font-size: 30px;
     align-self: end;
-  }
+  } */
 
 
 
@@ -278,7 +287,7 @@ body {
     margin-bottom: 30px;
   }
 
-  .left-calendar {
+  /* .left-calendar {
     position: relative;
     right: 180px;
     font-size: 30px;
@@ -291,7 +300,7 @@ body {
     font-size: 30px;
     align-self: end;
   }
-
+ */
 
   .nav-btn {
     font-size: 35px;
@@ -335,7 +344,7 @@ body {
 
   }
 
-  .left-calendar {
+  /* .left-calendar {
     position: relative;
     right: 100px;
     font-size: 30px;
@@ -347,7 +356,7 @@ body {
     left: 100px;
     font-size: 30px;
     align-self: end;
-  }
+  } */
 
 
 
@@ -393,12 +402,12 @@ body {
 
   .calendar-nav {
     font-size: 20px;
-    margin-top: 40px;
-    margin-bottom: 20px;
+    /* margin-top: 40px;
+    margin-bottom: 20px; */
 
   }
 
-  .left-calendar {
+  /* .left-calendar {
     position: relative;
     right: 30px;
     font-size: 30px;
@@ -410,7 +419,7 @@ body {
     left: 30px;
     font-size: 30px;
     align-self: end;
-  }
+  } */
 
 
 
@@ -440,4 +449,12 @@ body {
   .footer-msg {
     font-size: 20px;
   }
+}
+
+.left-calendar,
+.right-calendar {
+  font-size: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

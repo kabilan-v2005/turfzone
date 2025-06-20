@@ -19,6 +19,13 @@ const Secondpage = ({
   const [selectedDate, setSelectedDate] = useState(today);
   const [clickedDate, setClickedDate] = useState<Date | null>(null);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % images.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
   const nextImage = () => setCurrentSlide((prev) => (prev + 1) % images.length);
   const prevImage = () =>
     setCurrentSlide((prev) => (prev - 1 + images.length) % images.length);
@@ -35,34 +42,35 @@ const Secondpage = ({
     }
   };
 
+  const nextMonth = () => {
+    const newDate = new Date(selectedDate);
+    newDate.setMonth(newDate.getMonth() + 1);
+    setSelectedDate(newDate);
+  };
+
+  const prevMonth = () => {
+    const newDate = new Date(selectedDate);
+    newDate.setMonth(newDate.getMonth() - 1);
+    if (newDate >= today) {
+      setSelectedDate(newDate);
+    }
+  };
+
   const getWeekDates = () => {
     const weekDates = [];
-
     for (let i = 0; i < 7; i++) {
       const date = new Date(selectedDate);
       date.setDate(selectedDate.getDate() + i);
       weekDates.push(date);
     }
-
     return weekDates;
   };
-useEffect(() => {
-  const interval = setInterval(() => {
-    setCurrentSlide((prev) =>
-      prev === images.length - 1 ? 0 : prev + 1
-    );
-  }, 3000); // Every 3 seconds
-
-  return () => clearInterval(interval);
-}, []);
-
 
   useEffect(() => {
     setClickedDate(today);
   }, []);
 
   const formatDate = (date: Date) => `${date.getDate()}`;
-
   const isPastDate = (date: Date) => date < today;
 
   const handleDateClick = (date: Date) => {
@@ -80,7 +88,6 @@ useEffect(() => {
         <button className="nav-btn nav-left" onClick={prevImage}>
           &#x276E;
         </button>
-
         <div className="slider-image-wrapper">
           <div
             className="slider-track"
@@ -96,27 +103,31 @@ useEffect(() => {
             ))}
           </div>
         </div>
-
         <button className="nav-btn nav-right" onClick={nextImage}>
           &#x276F;
         </button>
       </div>
 
-      {/* Calendar */}
+      {/* Month Navigation */}
       <div className="calendar-nav">
-        <button className="left-calendar" onClick={prevWeek}>
+        <button className="left-calendar" onClick={prevMonth}>
           &#x276E;
         </button>
         <span>
           {selectedDate.toLocaleString("default", { month: "long" })}{" "}
           {selectedDate.getFullYear()}
         </span>
-        <button className="right-calendar" onClick={nextWeek}>
+        <button className="right-calendar" onClick={nextMonth}>
           &#x276F;
         </button>
       </div>
 
-      <div style={{ overflowX: "auto", width: "100%" }}>
+      {/* Week Navigation + Dates */}
+      <div className="calendar-nav weekdays-inside-nav">
+        <button className="left-calendar" onClick={prevWeek}>
+          &#x276E;
+        </button>
+
         <div className="weekdays">
           {weekDates.map((date, index) => {
             const isPast = isPastDate(date);
@@ -139,6 +150,10 @@ useEffect(() => {
             );
           })}
         </div>
+
+        <button className="right-calendar" onClick={nextWeek}>
+          &#x276F;
+        </button>
       </div>
 
       <div className="footer-msg">Book The Slot And Enjoy Your Day!</div>
