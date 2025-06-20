@@ -126,9 +126,18 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
     setShowEndTimePopup(true);
   };
 
+  // const handleConfirm = () => {
+  //   setShowPopup(false);
+  //   setShowSuccessPopup(true);
+  // };
   const handleConfirm = () => {
     setShowPopup(false);
     setShowSuccessPopup(true);
+
+    // Automatically confirm the slot after showing success popup
+    setTimeout(() => {
+      handleFinalConfirm();
+    }, 2000); // optional delay to show the success screen for 2 seconds
   };
 
   const handleFinalConfirm = () => {
@@ -269,33 +278,28 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
 
         {showSuccessPopup && (
           <div className="popup-overlay">
-            <div className="success-popup">
+            <div className="success-popup" onClick={(e) => e.stopPropagation()}>
               <div className="tick">✓</div>
               <h2>Thanks for your booking</h2>
-              <h3>Your Slot is Ready!</h3>
+              <h3>Your Slot is Confirmed!</h3>
               <table className="booking-table">
                 <thead>
                   <tr>
                     <th>Date</th>
-                    <th>Name</th>
                     <th>Phone No.</th>
                     <th>Time</th>
-                    <th>Price in ₹</th>
+                    <th>Price (₹)</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
                     <td>{bookingInfo.date}</td>
-                    <td>{bookingInfo.name}</td>
                     <td>{bookingInfo.phone}</td>
                     <td>{bookingInfo.time}</td>
                     <td>{bookingInfo.price}</td>
                   </tr>
                 </tbody>
               </table>
-              <button className="final-confirm" onClick={handleFinalConfirm}>
-                Confirm
-              </button>
             </div>
           </div>
         )}

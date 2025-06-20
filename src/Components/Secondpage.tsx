@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import "./Secondpage.css";
 import image1 from "../assets/herosectionbgg.jpg";
 import image2 from "../assets/logo.png";
+import image3 from "../assets/heroImage.svg";
 
-const images = [image1, image2];
+const images = [image1, image2, image3];
 const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 const Secondpage = ({
@@ -34,18 +35,26 @@ const Secondpage = ({
     }
   };
 
-const getWeekDates = () => {
-  const weekDates = [];
+  const getWeekDates = () => {
+    const weekDates = [];
 
-  for (let i = 0; i < 7; i++) {
-    const date = new Date(selectedDate);
-    date.setDate(selectedDate.getDate() + i);
-    weekDates.push(date);
-  }
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(selectedDate);
+      date.setDate(selectedDate.getDate() + i);
+      weekDates.push(date);
+    }
 
-  return weekDates;
-};
+    return weekDates;
+  };
+useEffect(() => {
+  const interval = setInterval(() => {
+    setCurrentSlide((prev) =>
+      prev === images.length - 1 ? 0 : prev + 1
+    );
+  }, 3000); // Every 3 seconds
 
+  return () => clearInterval(interval);
+}, []);
 
 
   useEffect(() => {
@@ -73,7 +82,19 @@ const getWeekDates = () => {
         </button>
 
         <div className="slider-image-wrapper">
-          <img src={images[currentSlide]} alt={`Slide ${currentSlide + 1}`} />
+          <div
+            className="slider-track"
+            style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+          >
+            {images.map((src, index) => (
+              <img
+                key={index}
+                src={src}
+                alt={`Slide ${index + 1}`}
+                className="slider-image"
+              />
+            ))}
+          </div>
         </div>
 
         <button className="nav-btn nav-right" onClick={nextImage}>
@@ -96,28 +117,29 @@ const getWeekDates = () => {
       </div>
 
       <div style={{ overflowX: "auto", width: "100%" }}>
-  <div className="weekdays">
-    {weekDates.map((date, index) => {
-      const isPast = isPastDate(date);
-      const isSelected = clickedDate?.toDateString() === date.toDateString();
+        <div className="weekdays">
+          {weekDates.map((date, index) => {
+            const isPast = isPastDate(date);
+            const isSelected =
+              clickedDate?.toDateString() === date.toDateString();
 
-      return (
-        <div
-          key={index}
-          className={`day ${isSelected ? "selected" : ""} ${
-            isPast ? "disabled" : ""
-          }`}
-          onClick={() => handleDateClick(date)}
-        >
-          <span>{formatDate(date)}</span>
-          <span>
-            {weekdays[date.getDay() === 0 ? 6 : date.getDay() - 1]}
-          </span>
+            return (
+              <div
+                key={index}
+                className={`day ${isSelected ? "selected" : ""} ${
+                  isPast ? "disabled" : ""
+                }`}
+                onClick={() => handleDateClick(date)}
+              >
+                <span>{formatDate(date)}</span>
+                <span>
+                  {weekdays[date.getDay() === 0 ? 6 : date.getDay() - 1]}
+                </span>
+              </div>
+            );
+          })}
         </div>
-      );
-    })}
-  </div>
-</div>
+      </div>
 
       <div className="footer-msg">Book The Slot And Enjoy Your Day!</div>
     </div>

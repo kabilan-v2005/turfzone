@@ -27,17 +27,27 @@ body {
   justify-content: center;
 
 }
-
-
 .slider-image-wrapper {
-  flex-grow: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  
-  height: 100%;
   width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
 }
+
+.slider-track {
+  display: flex;
+  height: 100%;
+  transition: transform 0.8s ease-in-out;
+  
+}
+
+.slider-image {
+  flex: 0 0 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 40px;
+}
+
 
 .slider img {
   width: 100%;
@@ -187,7 +197,7 @@ body {
 }
 
 .footer-msg {
-  margin-top: 80px;
+ 
   font-family: 'Rajdhani', sans-serif;
   font-weight: bold;
   font-size: 40px;

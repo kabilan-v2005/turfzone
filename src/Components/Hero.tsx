@@ -3,7 +3,7 @@ import './Hero.css';
 function Hero({ onScrollClick }: { onScrollClick: () => void }) {
   return (
     <div className="hero">
-      <div className="overlay"></div>
+      {/* <div className="overlay"></div>
       <div className="innercontent">
         <div className="hero-text">
           <h1>
@@ -17,7 +17,7 @@ function Hero({ onScrollClick }: { onScrollClick: () => void }) {
             Secure Your Spot
           </button>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
