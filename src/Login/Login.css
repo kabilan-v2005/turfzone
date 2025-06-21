@@ -16,8 +16,7 @@ html, body {
 
 .overall {
   display: flex;
-  width: 100%;
-  height: 100vh;
+  
   padding: 0;
 }
 
@@ -38,7 +37,7 @@ html, body {
 
 /* Right Side */
 .right-log {
-  width: 40%;
+
   display: flex;
   align-items: center;
   justify-content: center;
