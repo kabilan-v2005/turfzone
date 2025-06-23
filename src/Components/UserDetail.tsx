@@ -8,21 +8,21 @@ const Booking = () => {
   const navigate = useNavigate();
 
   const bookingData = [
-    ["01", "25/05/2024", "AAAAA", "1234567890", "Login"],
-    ["02", "22/11/2023", "BBBBB", "7171282922", "Logout"],
-    ["03", "11/07/2024", "CCCCC", "0987655433", "Login"],
-    ["04", "25/01/2024", "DDDDD", "1983764452", "Login"],
-    ["05", "15/05/2024", "EEEEE", "0937378494", "Login"],
-    ["06", "06/05/2023", "FFFFF", "1234567878", "Login"],
-    ["07", "06/05/2023", "GGGGG", "5555555567", "Logout"],
-    ["01", "25/05/2024", "AAAAA", "1234567890", "Login"],
-    ["02", "22/11/2023", "BBBBB", "7171282922", "Logout"],
-    ["03", "11/07/2024", "CCCCC", "0987655433", "Login"],
+    ["01", "25/05/2024", "AAAAA", "1234567890", "25/05/2024"],
+    ["02", "22/11/2023", "BBBBB", "7171282922", "22/11/2023"],
+    ["03", "11/07/2024", "CCCCC", "0987655433", "11/07/2024"],
+    ["04", "25/01/2024", "DDDDD", "1983764452", "-"],
+    ["05", "15/05/2024", "EEEEE", "0937378494", "15/05/2024"],
+    ["06", "06/05/2023", "FFFFF", "1234567878", "06/05/2023"],
+    ["07", "06/05/2023", "GGGGG", "5555555567", "-"],
+    ["01", "25/05/2024", "AAAAA", "1234567890", "25/05/2024"],
+    ["02", "22/11/2023", "BBBBB", "7171282922", "22/11/2023"],
+    ["03", "11/07/2024", "CCCCC", "0987655433", "11/07/2024"],
   ];
 
   const handleExport = () => {
     const worksheetData = [
-      ["No", "Last booking", "Name", "Phone No.", "Status"],
+      ["No", "Last booking", "Name", "Phone No.", "Upcoming booking"],
       ...bookingData,
     ];
     const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
@@ -60,17 +60,20 @@ const Booking = () => {
                 <th className="p-2 border">Last booking</th>
                 <th className="p-2 border">Name</th>
                 <th className="p-2 border">Phone No.</th>
-                <th className="p-2 border">Status</th>
+                <th className="p-2 border">Upcoming booking</th>
               </tr>
             </thead>
             <tbody>
-              {bookingData.map(([no, date, name, phone, status], index) => (
-                <tr key={index} className="border">
+              {bookingData.map(([no, date, name, phone,upcoming], index) => (
+                <tr key={index} className="border"  onClick={() =>
+        navigate("/admin/userdetail/user", {
+          state: { no, date, name, phone, upcoming },
+        })}>
                   <td className="p-2 border">{no}</td>
                   <td className="p-2 border">{date}</td>
                   <td className="p-2 border">{name}</td>
                   <td className="p-2 border">{phone}</td>
-                  <td className="p-2 border">{status}</td>
+                  <td className="p-2 border">{upcoming}</td>
                 </tr>
               ))}
             </tbody>
@@ -84,7 +87,7 @@ const Booking = () => {
     background: transparent;
     border: none;
     font-weight: 700;
-    font-size: 40px;
+    font-size: 30px;
     display: flex;
     align-items: center;
   }
@@ -179,7 +182,7 @@ const Booking = () => {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   }
 
-  td.status {
+  td.upcoming {
     color: black;
     font-weight: bold;
   }

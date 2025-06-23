@@ -10,6 +10,7 @@ import Dashboard from "./Components/Dashboard";
 import Booking from "./Components/Booking";
 import Management from "./Components/Management";
 import UserDetail from "./Components/UserDetail";
+import User from "./Components/User";
 import { useRef, useEffect, useState } from "react";
 
 function App() {
@@ -74,8 +75,12 @@ function App() {
         <Route path="/admin" element={<Layout />}>
           <Route index path="/admin/dashboard" element={<Dashboard />} />
           <Route path="/admin/booking" element={<Booking />} />
-          <Route path="/admin/management" element={<Management />} />
+          <Route
+            path="/admin/management"
+            element={<Management onScrollToThirdPage={scrollToThirdPage} />}
+          />
           <Route path="/admin/userdetail" element={<UserDetail />} />
+          <Route path="/admin/userdetail/user" element={<User />} />
         </Route>
       </Routes>
     </Router>
