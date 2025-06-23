@@ -62,7 +62,7 @@ function Login() {
 
       console.log("New User:", formData.username);
       alert("Username saved! Redirecting...");
-      navigate("/");
+      navigate("/", { state: { username: formData.username.trim() } });
     }
   };
 
