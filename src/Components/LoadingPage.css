@@ -1,23 +1,27 @@
 .loader-container {
   height: 100vh;
   width: 100vw;
-  background-color: #111;
+  background-color: white;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: #fff;
-  font-family: "Segoe UI", sans-serif;
+  color: black;
+  z-index: 9999;
+  position: fixed;
+  top: 0;
+  left: 0;
 }
 
-.football {
-  width: 80px;
-  height: 80px;
-  background: radial-gradient(circle, #fff 60%, #222 62%, #222 100%);
-  border-radius: 50%;
+.loading-image {
+  width: 100px;
+  height: 100px;
   animation: roll 2s linear infinite;
   margin-bottom: 10px;
+  transform-origin: center center;  /* ✅ Keeps rotation centered */
+  object-fit: contain;             /* ✅ Ensures the image stays within bounds */
 }
+
 
 @keyframes roll {
   0% {
@@ -33,5 +37,4 @@
 
 p {
   font-size: 1.2rem;
-  margin-top: 10px;
 }
