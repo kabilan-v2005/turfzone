@@ -1,4 +1,4 @@
-import "./App.css";
+import { useRef, useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Hedder from "./Components/Hedder";
 import Hero from "./Components/Hero";
@@ -10,8 +10,12 @@ import Dashboard from "./Components/Dashboard";
 import Booking from "./Components/Booking";
 import Management from "./Components/Management";
 import UserDetail from "./Components/UserDetail";
+<<<<<<< HEAD
 import User from "./Components/User";
 import { useRef, useEffect, useState } from "react";
+=======
+import LoadingPage from "./Components/LoadingPage"; // ✅ Import loading screen
+>>>>>>> f9ec824fb0e45095981e1914c1cabd464e694857
 
 function App() {
   const secondPageRef = useRef<HTMLDivElement>(null);
@@ -19,38 +23,41 @@ function App() {
 
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [shouldScrollToThirdPage, setShouldScrollToThirdPage] = useState(false);
+  const userTriggeredScroll = useRef(false);
 
-  const userTriggeredScroll = useRef(false); // ✅ Track if user action triggered scroll
+  const [loading, setLoading] = useState(true); // ✅ Loading state
 
-  // ✅ Scroll to top on initial page load
+  // ✅ Show loading screen for 2 seconds (simulate load)
   useEffect(() => {
     window.scrollTo(0, 0);
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+    return () => clearTimeout(timer);
   }, []);
 
-  // Scroll to Second Page when button is clicked
   const scrollToSecondPage = () => {
     secondPageRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Trigger scroll to Third Page from Second Page (user action)
   const scrollToThirdPage = (date: Date) => {
     setSelectedDate(date);
-    userTriggeredScroll.current = true; // ✅ Mark that scroll was user-initiated
+    userTriggeredScroll.current = true;
     setShouldScrollToThirdPage(true);
   };
 
-  // Scroll to Thirdpage only when user explicitly triggered it
   useEffect(() => {
     if (shouldScrollToThirdPage && userTriggeredScroll.current) {
       const timer = setTimeout(() => {
         thirdPageRef.current?.scrollIntoView({ behavior: "smooth" });
         setShouldScrollToThirdPage(false);
-        userTriggeredScroll.current = false; // ✅ Reset after scroll
+        userTriggeredScroll.current = false;
       }, 100);
-
       return () => clearTimeout(timer);
     }
   }, [selectedDate, shouldScrollToThirdPage]);
+
+  if (loading) return <LoadingPage />; // ✅ Show loader initially
 
   return (
     <Router>

@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
+
 import "./Hedder.css";
 import EditIcon from "../assets/edit.svg";
 import Login from "../assets/loginicon.svg";
@@ -9,28 +11,35 @@ function Hedder() {
   const navigate = useNavigate();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const [username, setUsername] = useState("User001");
-  const [dropdownVisible, setDropdownVisible] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [nameInput, setNameInput] = useState(username);
+  
+const [dropdownVisible, setDropdownVisible] = useState(false);
+const [isEditing, setIsEditing] = useState(false);
+const location = useLocation();
+const [username, setUsername] = useState(() => {
+  return location.state?.username || "User001";
+});
+const [nameInput, setNameInput] = useState(username);
 
-  const toggleDropdown = () => {
-    setDropdownVisible((prev) => !prev);
-    setIsEditing(false);
-  };
+const toggleDropdown = () => {
+  setDropdownVisible((prev) => !prev);
+  setIsEditing(false);
+};
+const handleSave = () => {
+  if (nameInput.trim()) {
+    setUsername(nameInput.trim());
+  }
+  setIsEditing(false);
+};
+
+
 
   const handleLogout = () => {
     console.log("Logged out");
     setDropdownVisible(false);
-    navigate("/");
+    navigate("/login");
   };
 
-  const handleSave = () => {
-    if (nameInput.trim()) {
-      setUsername(nameInput.trim());
-    }
-    setIsEditing(false);
-  };
+ 
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
