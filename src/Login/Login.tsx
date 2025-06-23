@@ -10,7 +10,7 @@ function Login() {
     username: "",
   });
 
-  const [isHuman, setIsHuman] = useState(false);
+  // const [isHuman, setIsHuman] = useState(false);
   const [showOtpField, setShowOtpField] = useState(false);
   const [isRegisteredUser, setIsRegisteredUser] = useState<boolean | null>(
     null
@@ -25,18 +25,18 @@ function Login() {
     }));
   };
 
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setIsHuman(e.target.checked);
-  };
+  // const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   setIsHuman(e.target.checked);
+  // };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!showOtpField) {
-      if (!isHuman) {
-        alert("Please confirm you're not a robot.");
-        return;
-      }
+      // if (!isHuman) {
+      //   alert("Please confirm you're not a robot.");
+      //   return;
+      // }
 
       if (!/^\d{10}$/.test(formData.phone)) {
         alert("Enter a valid 10-digit phone number.");
