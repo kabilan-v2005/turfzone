@@ -119,13 +119,13 @@ function Login() {
 
                 {!showOtpField && (
                   <div className="checkbox-container">
-                    <input
+                    {/* <input
                       type="checkbox"
                       id="robotCheck"
                       checked={isHuman}
                       onChange={handleCheckboxChange}
                     />
-                    <label htmlFor="robotCheck">I am not a robot</label>
+                    <label htmlFor="robotCheck">I am not a robot</label> */}
                   </div>
                 )}
 

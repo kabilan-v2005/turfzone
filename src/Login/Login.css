@@ -23,6 +23,7 @@ html, body {
 /* Left Side */
 .left-log {
   width: 60%;
+  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
