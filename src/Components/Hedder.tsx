@@ -22,7 +22,7 @@ function Hedder() {
   const handleLogout = () => {
     console.log("Logged out");
     setDropdownVisible(false);
-    navigate("/");
+    navigate("/login");
   };
 
   const handleSave = () => {
