@@ -113,7 +113,6 @@ body {
   display: flex;
   justify-content: center;
   overflow-x: auto;
-
   overflow-y: hidden;
   white-space: nowrap;
   gap: 12px;
