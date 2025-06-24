@@ -10,12 +10,8 @@ import Dashboard from "./Components/Dashboard";
 import Booking from "./Components/Booking";
 import Management from "./Components/Management";
 import UserDetail from "./Components/UserDetail";
-<<<<<<< HEAD
 import User from "./Components/User";
-import { useRef, useEffect, useState } from "react";
-=======
-import LoadingPage from "./Components/LoadingPage"; // ✅ Import loading screen
->>>>>>> f9ec824fb0e45095981e1914c1cabd464e694857
+import LoadingPage from "./Components/LoadingPage";
 
 function App() {
   const secondPageRef = useRef<HTMLDivElement>(null);
