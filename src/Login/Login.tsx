@@ -92,7 +92,7 @@ function Login() {
                   type="text"
                   id="username"
                   name="username"
-               
+                  style={{ padding:"10px"  }}
                   value={formData.username}
                   onChange={handleChange}
                 />
