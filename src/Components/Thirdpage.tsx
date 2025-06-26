@@ -122,6 +122,10 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
   const handleSlotClick = (index: number) => {
     const clickedSlot = slots[index];
     if (clickedSlot.status !== "available") return;
+
+    // Reset OTP popup state when starting a new booking
+    setShowOtpPopup(false);
+
     setStartSlotIndex(index);
     setShowEndTimePopup(true);
   };
@@ -285,8 +289,8 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
             <div className="success-popup" onClick={(e) => e.stopPropagation()}>
               <div className="tick">✓</div>
               <div className="success-message">
-              <p>Thanks for your booking</p>
-              <p>Your Slot is Confirmed!</p>
+                <p>Thanks for your booking</p>
+                <p>Your Slot is Confirmed!</p>
               </div>
               <table className="booking-table">
                 <thead>
