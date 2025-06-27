@@ -83,7 +83,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  /* center vertically */
+
   margin-bottom: 20px;
   overflow-x: hidden;
 }
@@ -138,7 +138,7 @@
 
 .booked {
   background-color: red;
-  color:white;
+  color: white;
   border: none;
   cursor: not-allowed;
 }
@@ -447,9 +447,7 @@
     grid-template-columns: repeat(4, 1fr);
   }
 
-  .slide-popup {
-    align-items: center;
-  }
+
 
 
 
@@ -488,6 +486,7 @@
     width: 90%;
     margin: 0 5%;
     padding: 15px;
+    align-items: center;
   }
 
   .login-prompt {
@@ -635,9 +634,6 @@
     width: 90%;
     max-width: 350px;
     animation: fadeIn 0.3s ease-out;
-  }
-  
-  .slide-popup {
     width: 95%;
     margin: 0 2.5%;
     padding: 12px;

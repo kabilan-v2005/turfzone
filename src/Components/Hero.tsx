@@ -14,8 +14,8 @@ function Hero({ onScrollClick }: { onScrollClick: () => void }) {
         </div>*/}
         <div className="cta-button-wrapper">
           <button className="cta-button" onClick={onScrollClick}>
-            Secure Your Spot
-          </button>
+            BOOK YOUR TURF NOW
+              </button>
         </div>
       {/* </div>  */}
     </div>
