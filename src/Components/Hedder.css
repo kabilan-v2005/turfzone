@@ -22,6 +22,11 @@
 }
 
 
+.Booking {
+  background-color: white;
+  color: #000;
+}
+
 .profile-section {
   display: flex;
   align-items: center;
@@ -57,8 +62,8 @@
 }
 
 .dropdown-menu button {
-  background-color: #007bff;
-  color: white;
+  background-color: white;
+  color: black;
   padding: 6px 10px;
   border: none;
   border-radius: 4px;
@@ -67,7 +72,8 @@
 }
 
 .dropdown-menu button:hover {
-  background-color: #0056b3;
+  background-color: #aacbef;
+  color: white;
 }
 
 .nav {
@@ -116,6 +122,7 @@
   width: 24px;
   margin-right: 24px;
 }
+
 .nav {
   display: flex;
   justify-content: space-between;
@@ -131,6 +138,7 @@
   position: relative;
   cursor: pointer;
 }
+
 .dropdown-header {
   display: flex;
   align-items: center;
@@ -223,10 +231,10 @@
   width: 18px;
   height: 18px;
 }
+
 .dropdown-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
 }
-

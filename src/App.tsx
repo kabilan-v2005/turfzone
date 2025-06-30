@@ -59,11 +59,13 @@ function App() {
     <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
+         <Route path="/user" element={<User />} />
         <Route
           path="/"
           element={
             <>
               <Hedder />
+             
               <Hero onScrollClick={scrollToSecondPage} />
               <div ref={secondPageRef}>
                 <Secondpage onScrollToThirdPage={scrollToThirdPage} />

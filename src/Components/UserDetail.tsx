@@ -29,7 +29,10 @@ const Booking = () => {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Bookings");
 
-    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
     const data = new Blob([excelBuffer], {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
@@ -64,11 +67,16 @@ const Booking = () => {
               </tr>
             </thead>
             <tbody>
-              {bookingData.map(([no, date, name, phone,upcoming], index) => (
-                <tr key={index} className="border"  onClick={() =>
-        navigate("/admin/userdetail/user", {
-          state: { no, date, name, phone, upcoming },
-        })}>
+              {bookingData.map(([no, date, name, phone, upcoming], index) => (
+                <tr
+                  key={index}
+                  className="border"
+                  onClick={() =>
+                    navigate("/admin/userdetail/user", {
+                      state: { no, date, name, phone, upcoming },
+                    })
+                  }
+                >
                   <td className="p-2 border">{no}</td>
                   <td className="p-2 border">{date}</td>
                   <td className="p-2 border">{name}</td>
@@ -234,7 +242,6 @@ const Booking = () => {
     }
   }
 `}</style>
-
       </div>
     </>
   );

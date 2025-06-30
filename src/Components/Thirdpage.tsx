@@ -106,7 +106,7 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
       setSlots((prevSlots) =>
         prevSlots.map((slot) => {
           const startTime = parseTime(slot.time, selectedDate);
-          if (slot.status === "maintenance" || slot.status === "booked")
+          
             return slot;
           const endTime = new Date(startTime.getTime() + 30 * 60 * 1000);
           if (isToday && now >= endTime) return { ...slot, status: "disabled" };

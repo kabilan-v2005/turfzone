@@ -7,39 +7,35 @@ import EditIcon from "../assets/edit.svg";
 import Login from "../assets/loginicon.svg";
 import logo from "../assets/logo.png";
 
+
 function Hedder() {
   const navigate = useNavigate();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  
-const [dropdownVisible, setDropdownVisible] = useState(false);
-const [isEditing, setIsEditing] = useState(false);
-const location = useLocation();
-const [username, setUsername] = useState(() => {
-  return location.state?.username || "User001";
-});
-const [nameInput, setNameInput] = useState(username);
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const location = useLocation();
+  const [username, setUsername] = useState(() => {
+    return location.state?.username || "User001";
+  });
+  const [nameInput, setNameInput] = useState(username);
 
-const toggleDropdown = () => {
-  setDropdownVisible((prev) => !prev);
-  setIsEditing(false);
-};
-const handleSave = () => {
-  if (nameInput.trim()) {
-    setUsername(nameInput.trim());
-  }
-  setIsEditing(false);
-};
-
-
+  const toggleDropdown = () => {
+    setDropdownVisible((prev) => !prev);
+    setIsEditing(false);
+  };
+  const handleSave = () => {
+    if (nameInput.trim()) {
+      setUsername(nameInput.trim());
+    }
+    setIsEditing(false);
+  };
 
   const handleLogout = () => {
     console.log("Logged out");
     setDropdownVisible(false);
     navigate("/login");
   };
-
- 
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -54,6 +50,13 @@ const handleSave = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+
+
+  
+  const [phoneNumber] = useState(
+    () => location.state?.phoneNumber || "9876543210"
+  );
 
   return (
     <nav className="nav">
@@ -105,7 +108,18 @@ const handleSave = () => {
             </div>
 
             <hr className="divider" />
+            <button
+              className="Booking"
+              onClick={() =>
+                navigate("/user", {
+                  state: { phone: phoneNumber },
+                })
+              }
+            >
+              Bookings
+            </button>
 
+            <hr className="divider" />
             <div className="logout-btn" onClick={handleLogout}>
               <img src={Login} alt="Logout" className="logout-icon" />
               Log out
