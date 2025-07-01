@@ -168,6 +168,8 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
 
   // Calculate total hours based on selected slots (each slot is 1 hour here, adjust if needed)
   const totalHours = sorted.length;
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
+
 
   return (
     <div className="main">
@@ -313,6 +315,24 @@ const Thirdpage: React.FC<Props> = ({ selectedDate }) => {
             </div>
           </div>
         )}
+        {showErrorPopup && (
+  <div className="popup-overlay">
+    <div className="error-popup">
+      <div className="cross" onClick={() => setShowErrorPopup(false)}>✖</div>
+      <h2>Booking Failed</h2>
+      <h3>Selected slot(s) already booked by someone else.</h3>
+      <button
+        className="error-booking"
+        onClick={() => {
+          window.location.reload();
+        }}
+      >
+        Reload Page
+      </button>
+    </div>
+  </div>
+)}
+
 
         {showEndTimePopup && startSlotIndex !== null && (
           <div
